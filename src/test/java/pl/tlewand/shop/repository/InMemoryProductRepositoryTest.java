@@ -6,9 +6,10 @@ import pl.tlewand.shop.model.Electronics;
 import pl.tlewand.shop.model.Product;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 
@@ -84,32 +85,66 @@ class InMemoryProductRepositoryTest {
     }
 
     @Test
-    @Disabled("TODO")
     void shouldReturnProductsList() {
-        //findAll() - istniejące repo z zawartością
+
+        Product product1 = new Electronics(1, "Product1", new BigDecimal("10.00"), 100);
+        Product product2 = new Electronics(2, "Product2", new BigDecimal("20.00"), 200);
+        Product product3 = new Electronics(3, "Product3", new BigDecimal("30.00"), 300);
+        repository.save(product1);
+        repository.save(product2);
+        repository.save(product3);
+
+        List<Product> all = repository.findAll();
+
+        assertThat(all)
+                .containsExactly(product1,product2,product3);
     }
 
     @Test
-    @Disabled("TODO")
     void shouldReturnEmptyList() {
         //findAll() - puste repo
+        List<Product> all = repository.findAll();
+
+        assertThat(all)
+                .isEmpty();
     }
 
     @Test
-    @Disabled("TODO")
     void shouldThrowUnsupportedOperationExceptionWhenTryModifyResult() {
         //findAll() - próba modyfikacji zwróconej listy
+
+        Product product1 = new Electronics(1, "Product1", new BigDecimal("10.00"), 100);
+        Product product2 = new Electronics(2, "Product2", new BigDecimal("20.00"), 200);
+        repository.save(product1);
+        List<Product> all = repository.findAll();
+
+        assertThatThrownBy(()-> all.add(product2))
+                .isInstanceOf(UnsupportedOperationException.class);
     }
 
     @Test
-    @Disabled("TODO")
     void shouldDeleteProductIfExists() {
-        //delete(istniejące id)
+
+        Product product1 = new Electronics(1, "Product1", new BigDecimal("10.00"), 100);
+        Product product2 = new Electronics(2, "Product2", new BigDecimal("20.00"), 200);
+        repository.save(product1);
+        repository.save(product2);
+
+        repository.delete(1);
+
+        assertThat(repository.find(1))
+                .isEmpty();
     }
 
     @Test
-    @Disabled("TODO")
     void shouldDoNothingWhenTryDeleteNotExistingProduct() {
-        //delete(nieistniejące id)
+
+        Product product1 = new Electronics(1, "Product1", new BigDecimal("10.00"), 100);
+        repository.save(product1);
+
+        repository.delete(2);
+
+        assertThat(repository.findAll())
+                .containsExactly(product1);
     }
 }
