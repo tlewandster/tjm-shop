@@ -30,7 +30,7 @@ public class ProductManager {
     }
 
     public List<Product> findAll() {
-        return List.of();
+        return List.copyOf(productRepository.findAll());
     }
 
     public Product delete(long id) {
