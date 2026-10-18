@@ -1,6 +1,5 @@
 package pl.tlewand.shop.repository;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import pl.tlewand.shop.model.Electronics;
 import pl.tlewand.shop.model.Product;
@@ -9,9 +8,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class InMemoryProductRepositoryTest {
     private final InMemoryProductRepository repository = new InMemoryProductRepository();
@@ -28,10 +26,11 @@ class InMemoryProductRepositoryTest {
     }
 
     @Test
-    void shouldThrowXWhenTryToSaveNull() {
+    void shouldThrowNullPointerExceptionWhenTryToSaveNull() {
 
         assertThatThrownBy(() -> repository.save(null))
-                .isInstanceOf(NullPointerException.class);
+                .isInstanceOf(NullPointerException.class)
+                .hasMessage("Product being saved cannot be null");
     }
 
     @Test
@@ -52,8 +51,9 @@ class InMemoryProductRepositoryTest {
     @Test
     void shouldThrowNullPointerExceptionWhenTryToUpdateNull() {
 
-        assertThatThrownBy(()->repository.update(null))
-                .isInstanceOf(NullPointerException.class);
+        assertThatThrownBy(() -> repository.update(null))
+                .isInstanceOf(NullPointerException.class)
+                .hasMessage("Product being updated cannot be null");
     }
 
     @Test
@@ -72,7 +72,7 @@ class InMemoryProductRepositoryTest {
     }
 
     @Test
-    void shouldReturnEmptyOptionalIfNotExist() {
+    void shouldReturnEmptyOptionalIfNotExists() {
 
         Product product = new Electronics(10, "Product", new BigDecimal("10.00"), 200);
         repository.save(product);
@@ -97,12 +97,12 @@ class InMemoryProductRepositoryTest {
         List<Product> all = repository.findAll();
 
         assertThat(all)
-                .containsExactly(product1,product2,product3);
+                .containsExactly(product1, product2, product3);
     }
 
     @Test
     void shouldReturnEmptyList() {
-        //findAll() - puste repo
+
         List<Product> all = repository.findAll();
 
         assertThat(all)
@@ -111,29 +111,28 @@ class InMemoryProductRepositoryTest {
 
     @Test
     void shouldThrowUnsupportedOperationExceptionWhenTryModifyResult() {
-        //findAll() - próba modyfikacji zwróconej listy
 
         Product product1 = new Electronics(1, "Product1", new BigDecimal("10.00"), 100);
         Product product2 = new Electronics(2, "Product2", new BigDecimal("20.00"), 200);
         repository.save(product1);
         List<Product> all = repository.findAll();
 
-        assertThatThrownBy(()-> all.add(product2))
+        assertThatThrownBy(() -> all.add(product2))
                 .isInstanceOf(UnsupportedOperationException.class);
     }
 
     @Test
     void shouldDeleteProductIfExists() {
-
-        Product product1 = new Electronics(1, "Product1", new BigDecimal("10.00"), 100);
+        long idToDelete = 1;
+        Product product1 = new Electronics(idToDelete, "Product1", new BigDecimal("10.00"), 100);
         Product product2 = new Electronics(2, "Product2", new BigDecimal("20.00"), 200);
         repository.save(product1);
         repository.save(product2);
 
-        repository.delete(1);
+        repository.delete(idToDelete);
 
-        assertThat(repository.find(1))
-                .isEmpty();
+        assertThat(repository.findAll())
+                .containsExactly(product2);
     }
 
     @Test
