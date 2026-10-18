@@ -71,9 +71,16 @@ class InMemoryProductRepositoryTest {
     }
 
     @Test
-    @Disabled("TODO")
     void shouldReturnEmptyOptionalIfNotExist() {
-        //find(nieistniejące id)
+
+        Product product = new Electronics(10, "Product", new BigDecimal("10.00"), 200);
+        repository.save(product);
+        long searchedId = 20;
+
+        Optional<Product> foundProduct = repository.find(searchedId);
+
+        assertThat(foundProduct)
+                .isEmpty();
     }
 
     @Test
