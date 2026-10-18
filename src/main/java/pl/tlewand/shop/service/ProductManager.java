@@ -6,7 +6,7 @@ import pl.tlewand.shop.repository.ProductRepository;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
+import java.util.NoSuchElementException;
 
 public class ProductManager {
     private final ProductRepository productRepository;
@@ -26,7 +26,9 @@ public class ProductManager {
     }
 
     public Product find(long id) {
-        return null;
+        return productRepository.find(id).orElseThrow(
+                () -> new NoSuchElementException("No product with ID %d was found".formatted(id))
+        );
     }
 
     public List<Product> findAll() {
