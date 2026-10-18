@@ -40,16 +40,22 @@ public class ProductManager {
         productRepository.delete(id);
     }
 
-    public Product updateName(long id, String newName) {
-        return null; //tu będzie zwracany zmieniany obiekt
+    public void updateName(long id, String newName) {
+        Product product = find(id);
+        product.setName(newName);
+        productRepository.update(product);
     }
 
-    public Product updatePrice(long id, BigDecimal newPrice) {
-        return null; //tu będzie zwracany zmieniany obiekt
+    public void updatePrice(long id, BigDecimal newPrice) {
+        Product product = find(id);
+        product.setPrice(newPrice);
+        productRepository.update(product);
     }
 
-    public Product updateStock(long id, int newStock) {
-        return null; //tu będzie zwracany zmieniany obiekt
+    public void updateStock(long id, int newStock) {
+        Product product = find(id);
+        product.setStock(newStock);
+        productRepository.update(product);
     }
 }
 
