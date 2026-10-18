@@ -35,8 +35,9 @@ public class ProductManager {
         return List.copyOf(productRepository.findAll());
     }
 
-    public Product delete(long id) {
-        return null; //tu będzie zwracany produkt, który usuniemy
+    public void delete(long id) {
+        find(id);
+        productRepository.delete(id);
     }
 
     public Product updateName(long id, String newName) {
