@@ -6,6 +6,7 @@ import pl.tlewand.shop.model.Electronics;
 import pl.tlewand.shop.model.Product;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -48,15 +49,25 @@ class InMemoryProductRepositoryTest {
     }
 
     @Test
-    @Disabled("TODO")
-    void shouldThrowXWhenTryToUpdateNull() {
-        //update(null)
+    void shouldThrowNullPointerExceptionWhenTryToUpdateNull() {
+
+        assertThatThrownBy(()->repository.update(null))
+                .isInstanceOf(NullPointerException.class);
     }
 
     @Test
-    @Disabled("TODO")
     void shouldReturnProductIfExists() {
-        //find(istniejące id) - dwa produkty
+
+        Product product = new Electronics(10, "Product", new BigDecimal("10.00"), 200);
+        repository.save(product);
+        long searchedId = 20;
+        Product searchedProduct = new Electronics(searchedId, "Product", new BigDecimal("20.00"), 200);
+        repository.save(searchedProduct);
+
+        Optional<Product> foundProduct = repository.find(searchedId);
+
+        assertThat(foundProduct)
+                .containsSame(searchedProduct);
     }
 
     @Test
