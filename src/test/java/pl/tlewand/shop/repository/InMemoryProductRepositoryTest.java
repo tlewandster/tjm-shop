@@ -3,35 +3,48 @@ package pl.tlewand.shop.repository;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import pl.tlewand.shop.model.Electronics;
+import pl.tlewand.shop.model.Product;
 
 import java.math.BigDecimal;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 
 class InMemoryProductRepositoryTest {
-    private final InMemoryProductRepository inMemoryProductRepository = new InMemoryProductRepository();
+    private final InMemoryProductRepository repository = new InMemoryProductRepository();
 
     @Test
     void shouldSaveNewProduct() {
         long id = 1;
         Electronics product = new Electronics(id, "Produkt", new BigDecimal("10.00"), 100);
 
-        inMemoryProductRepository.save(product);
+        repository.save(product);
 
-        assertThat(inMemoryProductRepository.find(id)).containsSame(product);
+        assertThat(repository.find(id))
+                .containsSame(product);
     }
 
     @Test
-    @Disabled("TODO")
     void shouldThrowXWhenTryToSaveNull() {
-        //save(null)
+
+        assertThatThrownBy(() -> repository.save(null))
+                .isInstanceOf(NullPointerException.class);
     }
 
     @Test
-    @Disabled("TODO")
     void shouldUpdateProduct() {
-        //update(ok) dodać najpierw zmieniany obiekt
+
+        long id = 10;
+        Product product = new Electronics(id, "Product", new BigDecimal("10.00"), 200);
+        repository.save(product);
+        Product updatedProduct = new Electronics(id, "Product", new BigDecimal("20.00"), 200);
+
+        repository.update(updatedProduct);
+
+        assertThat(repository.find(id))
+                .containsSame(updatedProduct);
+
     }
 
     @Test
