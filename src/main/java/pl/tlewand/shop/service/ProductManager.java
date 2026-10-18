@@ -6,6 +6,7 @@ import pl.tlewand.shop.repository.ProductRepository;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 public class ProductManager {
     private final ProductRepository productRepository;
@@ -15,8 +16,13 @@ public class ProductManager {
         this.productRepository = productRepository;
     }
 
-    public Product add(Product product) {
-        return null; //tu będzie zwracany utworzony obiekt
+    public void add(Product product) {
+        Validate.notNull(product, "Product cannot be null");
+        Validate.isTrue(
+                productRepository.find(product.getId()).isEmpty(),
+                "Product with ID %d already exists", product.getId()
+        );
+        productRepository.save(product);
     }
 
     public Product find(long id) {
