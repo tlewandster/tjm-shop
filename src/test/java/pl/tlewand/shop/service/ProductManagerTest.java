@@ -1,14 +1,23 @@
 package pl.tlewand.shop.service;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import pl.tlewand.shop.model.Electronics;
+import pl.tlewand.shop.model.Product;
 import pl.tlewand.shop.repository.ProductRepository;
 
-import static org.assertj.core.api.Assertions.*;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ProductManagerTest {
@@ -20,130 +29,188 @@ class ProductManagerTest {
     private ProductManager productManager;
 
     @Test
-    void shouldThrowNPEWhenRepoIsNull() {
+    void shouldThrowNullPointerExceptionWhenRepoIsNull() {
 
-        assertThatThrownBy(()->new ProductManager(null))
+        assertThatThrownBy(() -> new ProductManager(null))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("Product repository cannot be null");
     }
 
     @Test
-    @Disabled("TODO")
     void shouldAddProduct() {
-        // add(ok)
-        // HP
-        // czy poszło save()
+        long id = 10;
+        Electronics product = new Electronics(id, "Product", new BigDecimal("20.00"), 50);
+        when(productRepository.find(id)).thenReturn(Optional.empty());
+
+        productManager.add(product);
+
+        verify(productRepository).save(product);
     }
 
     @Test
-    @Disabled("TODO")
-    void shouldThrowNPEWhenProductIsNull() {
-        // add(null) -> NPE
-        // czy nie poszło find()
-        // czy nie poszło save()
+    void shouldThrowNullPointerExceptionWhenProductIsNull() {
+        assertThatThrownBy(() -> productManager.add(null))
+                .isInstanceOf(NullPointerException.class)
+                .hasMessage("Product cannot be null");
+
+        verifyNoInteractions(productRepository);
     }
 
     @Test
-    @Disabled("TODO")
-    void shouldThrowIAEWhenProductAlreadyExist() {
-        // add(nieznane id) -> NSEE + mess
-        //czy poszło find()
-        //czy nie poszło save()
+    void shouldThrowIllegalArgumentExceptionWhenProductAlreadyExists() {
+        long id = 13;
+        Product product = new Electronics(id, "Product", new BigDecimal("10.00"), 123);
+        when(productRepository.find(id)).thenReturn(Optional.of(product));
+
+        assertThatThrownBy(() -> productManager.add(product))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Product with ID %d already exists", id);
+        verify(productRepository, never()).save(any());
     }
 
     @Test
-    @Disabled("TODO")
     void shouldFindProduct() {
-        // find(HP)
-        // czy poszło find() -> Optional z wartością
+        long id = 13;
+        Product foundProduct = new Electronics(id, "Product", new BigDecimal("10.00"), 123);
+        when(productRepository.find(id)).thenReturn(Optional.of(foundProduct));
+
+        Product returnedProduct = productManager.find(id);
+
+        assertThat(returnedProduct)
+                .isSameAs(foundProduct);
     }
 
     @Test
-    @Disabled("TODO")
     void shouldThrowNoSuchElementExceptionWhenProductNotFound() {
-        // find(nieznane id) -> IAE + mess
-        // czy poszło find() -> Optional pusty
+        long id = 123;
+        when(productRepository.find(id)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> productManager.find(id))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessage("No product with ID %d was found", id);
     }
 
     @Test
-    @Disabled("TODO")
     void shouldFindAll() {
-        // findAll() -> List (jak to sprawdzić?? tak samo jak w repo??)
+        Product product1 = new Electronics(1, "Product1", new BigDecimal("10.00"), 100);
+        Product product2 = new Electronics(2, "Product2", new BigDecimal("20.00"), 200);
+        when(productRepository.findAll()).thenReturn(new ArrayList<>(List.of(product1, product2)));
+
+        List<Product> all = productManager.findAll();
+
+        assertThat(all).containsExactly(product1, product2);
     }
 
     @Test
-    @Disabled("TODO")
-    void shouldThrowExceptionWhenReturnedListIsModifiable() {
-        // findAll() -> List (jak to sprawdzić?? tak samo jak w repo??)
+    void shouldReturnUnmodifiableList() {
+        Product product1 = new Electronics(1, "Product1", new BigDecimal("10.00"), 100);
+        Product product2 = new Electronics(2, "Product2", new BigDecimal("20.00"), 200);
+        when(productRepository.findAll()).thenReturn(new ArrayList<>(List.of(product1)));
+
+        List<Product> all = productManager.findAll();
+
+        assertThatThrownBy(() -> all.add(product2))
+                .isInstanceOf(UnsupportedOperationException.class);
     }
 
     @Test
-    @Disabled("TODO")
-    void shouldReturnEmptyList() {
-        //findAll() przy pustym repo -> pusta lista
-    }
-
-    @Test
-    @Disabled("TODO")
     void shouldDeleteProduct() {
-        // HP
-        // czy wykonane find() -> Optional z value
-        // czy wykonane delete()
+        long id = 20;
+        Product product = new Electronics(id, "Product1", new BigDecimal("10.00"), 100);
+        when(productRepository.find(id)).thenReturn(Optional.of(product));
+
+        productManager.delete(id);
+
+        verify(productRepository).delete(id);
     }
 
     @Test
-    @Disabled("TODO")
-    void shouldThrowNoSuchElementExceptionWhenDeletingDontKnownProduct() {
-        // delete(nieznany id)
-        // czy wykonane find() -> Optional pusty
-        // czy nie wykonane delete
+    void shouldThrowNoSuchElementExceptionWhenDeletingUnknownProduct() {
+        long id = 666;
+        when(productRepository.find(id)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> productManager.delete(id))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessage("No product with ID %d was found", id);
+        verify(productRepository, never()).delete(anyLong());
     }
 
     @Test
-    @Disabled("TODO")
     void shouldUpdateName() {
-        // updateName(HP)
-        // czy wykonane find() -> Optional value
-        // czy wykonany update
+        long id = 7;
+        String newName = "newName";
+        Product product1 = new Electronics(id, "Product1", new BigDecimal("10.00"), 100);
+        when(productRepository.find(id)).thenReturn(Optional.of(product1));
+
+        productManager.updateName(id, newName);
+
+        verify(productRepository).update(product1);
+        assertThat(product1.getName())
+                .isEqualTo(newName);
     }
 
     @Test
-    @Disabled("TODO")
-    void shouldThrowNoSuchElementExceptionWhenUpdatingNameDontKnownProduct() {
-        // updateName(nieznany id)
-        // czy wykonane find() -> Optional pusty
-        // czy nie wykonane update
+    void shouldThrowNoSuchElementExceptionWhenUpdatingNameUnknownProduct() {
+        long id = 13;
+        String newName = "newName";
+        when(productRepository.find(id)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> productManager.updateName(id, newName))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessage("No product with ID %d was found", id);
+        verify(productRepository, never()).update(any());
     }
 
     @Test
-    @Disabled("TODO")
     void shouldUpdatePrice() {
-        // updatePrice(HP)
-        // czy wykonane find() -> Optional value
-        // czy wykonany update
+        long id = 7;
+        BigDecimal newPrice = new BigDecimal("100.00");
+        Product product1 = new Electronics(id, "Product1", new BigDecimal("10.00"), 100);
+        when(productRepository.find(id)).thenReturn(Optional.of(product1));
+
+        productManager.updatePrice(id, newPrice);
+
+        verify(productRepository).update(product1);
+        assertThat(product1.getPrice())
+                .isEqualByComparingTo(newPrice);
+    }
+
+
+    @Test
+    void shouldThrowNoSuchElementExceptionWhenUpdatingPriceUnknownProduct() {
+        long id = 13;
+        BigDecimal newPrice = new BigDecimal("250.00");
+        when(productRepository.find(id)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> productManager.updatePrice(id, newPrice))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessage("No product with ID %d was found", id);
+        verify(productRepository, never()).update(any());
     }
 
     @Test
-    @Disabled("TODO")
-    void shouldThrowNoSuchElementExceptionWhenUpdatingPriceDontKnownProduct() {
-        // updatePrice(nieznany id)
-        // czy wykonane find() -> Optional pusty
-        // czy nie wykonane update
-    }
-
-    @Test
-    @Disabled("TODO")
     void shouldUpdateStock() {
-        // updateStock(HP)
-        // czy wykonane find() -> Optional value
-        // czy wykonany update
+        long id = 7;
+        int newStock = 1;
+        Product product1 = new Electronics(id, "Product", new BigDecimal("10.00"), 100);
+        when(productRepository.find(id)).thenReturn(Optional.of(product1));
+
+        productManager.updateStock(id, newStock);
+
+        verify(productRepository).update(product1);
+        assertThat(product1.getStock())
+                .isEqualTo(newStock);
     }
 
     @Test
-    @Disabled("TODO")
-    void shouldThrowNoSuchElementExceptionWhenUpdatingStockDontKnownProduct() {
-        // updateStock(nieznany id)
-        // czy wykonane find() -> Optional pusty
-        // czy nie wykonane update
+    void shouldThrowNoSuchElementExceptionWhenUpdatingStockUnknownProduct() {
+        long id = 13;
+        int newStock = 123;
+        when(productRepository.find(id)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> productManager.updateStock(id, newStock))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessage("No product with ID %d was found", id);
+        verify(productRepository, never()).update(any());
     }
 }
