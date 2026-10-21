@@ -29,7 +29,7 @@ public class Cart {
         Optional<CartItem> sameItemInCart = items.values().stream()
                 .filter((cartItem) ->
                         cartItem.getProduct().getId() == product.getId() &&
-                                Objects.equals(cartItem.getComputerConfig(), config))
+                                Objects.equals(cartItem.getItemConfig(), config))
                 .findFirst();
         if (sameItemInCart.isPresent()) {
             sameItemInCart.get().increaseQtyBy(qty);
@@ -50,15 +50,28 @@ public class Cart {
         items.clear();
     }
 
-    public List<CartItem> getItems(){
-        return  List.copyOf(items.values());
+    public List<CartItem> getItems() {
+        return List.copyOf(items.values());
     }
 
     public BigDecimal totalPrice() {
-        return BigDecimal.ZERO;
+        return items.values().stream()
+                .map(cartItem ->
+                        cartItem.calculateUnitItemPrice()
+                                .multiply(BigDecimal.valueOf(cartItem.getQty())))
+                .reduce(BigDecimal::add)
+                .orElse(BigDecimal.ZERO);
     }
 
-    public List<CartItem> checkout() {
-            return List.of();
+    public List<OrderItem> checkout() {
+        return items.values().stream()
+                .map(cartItem -> new OrderItem(
+                        cartItem.getProduct().getId(),
+                        cartItem.getProduct().getName(),
+                        cartItem.calculateUnitItemPrice(),
+                        cartItem.getQty(),
+                        cartItem.getItemConfig()
+                ))
+                .toList();
     }
 }
