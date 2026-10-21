@@ -4,17 +4,14 @@ import lombok.Getter;
 import org.apache.commons.lang3.Validate;
 
 import java.math.BigDecimal;
-
+@Getter
 class CartItem {
     private final long itemId;
-    @Getter
     private final Product product;
-    @Getter
     private final ComputerConfig itemConfig;
-    @Getter
     private int qty;
 
-    public CartItem(long itemId, Product product, ComputerConfig itemConfig, int qty) {
+    CartItem(long itemId, Product product, ComputerConfig itemConfig, int qty) {
         Validate.isTrue(qty > 0, "Quantity must be > 0");
         this.itemId = itemId;
         this.product = product;

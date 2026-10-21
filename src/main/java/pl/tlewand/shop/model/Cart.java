@@ -50,7 +50,7 @@ public class Cart {
         items.clear();
     }
 
-    public List<CartItem> getItems() {
+    List<CartItem> getItems() {
         return List.copyOf(items.values());
     }
 

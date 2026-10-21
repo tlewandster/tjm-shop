@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 @Getter
 public class Computer extends Product{
-
+    @Getter
     private final Cpu cpu;
     private final Gpu gpu;
     private final Ram ram;
