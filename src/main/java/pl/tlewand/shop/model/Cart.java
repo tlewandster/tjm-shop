@@ -6,8 +6,8 @@ import java.math.BigDecimal;
 import java.util.*;
 
 public class Cart {
-    private final Map<Integer, CartItem> items = new LinkedHashMap<>();
-    private int itemIdCounter = 0;
+    private final Map<Long, CartItem> items = new LinkedHashMap<>();
+    private long itemIdCounter = 0;
 
     public void addItem(Product product, ComputerConfig config, int qty) {
         Validate.notNull(product, "Product cannot be null");
@@ -40,7 +40,7 @@ public class Cart {
         items.put(itemIdCounter, cartItem);
     }
 
-    public void removeItem(int itemId) {
+    public void removeItem(long itemId) {
         if (items.remove(itemId) == null) {
             throw new NoSuchElementException("Item " + itemId + " is not in cart");
         }
