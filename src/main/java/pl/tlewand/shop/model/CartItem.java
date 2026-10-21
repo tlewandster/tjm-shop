@@ -5,7 +5,7 @@ import org.apache.commons.lang3.Validate;
 
 import java.math.BigDecimal;
 
-public class CartItem {
+class CartItem {
     private final long itemId;
     @Getter
     private final Product product;

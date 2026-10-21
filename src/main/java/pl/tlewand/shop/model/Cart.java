@@ -64,7 +64,8 @@ public class Cart {
     }
 
     public List<OrderItem> checkout() {
-        return items.values().stream()
+        Validate.validState(!items.isEmpty(),"Cart cannot be empty at checkout");
+        List<OrderItem> orderItems = items.values().stream()
                 .map(cartItem -> new OrderItem(
                         cartItem.getProduct().getId(),
                         cartItem.getProduct().getName(),
@@ -73,5 +74,7 @@ public class Cart {
                         cartItem.getItemConfig()
                 ))
                 .toList();
+        clear();
+        return orderItems;
     }
 }
