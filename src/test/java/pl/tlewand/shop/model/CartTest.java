@@ -3,6 +3,7 @@ package pl.tlewand.shop.model;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -74,23 +75,23 @@ public class CartTest {
     void shouldMergeSameProductAndConfig() {
         int firstItemQty = 1;
         int secondItemQty = 2;
-        cart.addItem(COMPUTER,COMPUTER_CONFIG,firstItemQty);
+        cart.addItem(COMPUTER, COMPUTER_CONFIG, firstItemQty);
 
-        cart.addItem(COMPUTER,COMPUTER_CONFIG,secondItemQty);
+        cart.addItem(COMPUTER, COMPUTER_CONFIG, secondItemQty);
 
         assertThat(cart.getItems().size())
                 .isEqualTo(1);
         assertThat(cart.getItems().getFirst().getQty())
-                .isEqualTo(firstItemQty+secondItemQty);
+                .isEqualTo(firstItemQty + secondItemQty);
     }
 
     @Test
     void shouldCreateSeparateItemsForDifferentConfig() {
         ComputerConfig firstConfig = new ComputerConfig(Cpu.AMD_RYZEN_7, Gpu.NVIDIA_RTX_4060, Ram._16GB);
         ComputerConfig secondConfig = new ComputerConfig(Cpu.AMD_RYZEN_5, Gpu.AMD_RX_7700, Ram._32GB);
-        cart.addItem(COMPUTER,firstConfig,QTY);
+        cart.addItem(COMPUTER, firstConfig, QTY);
 
-        cart.addItem(COMPUTER,secondConfig,QTY);
+        cart.addItem(COMPUTER, secondConfig, QTY);
 
         assertThat(cart.getItems().size())
                 .isEqualTo(2);
@@ -100,15 +101,15 @@ public class CartTest {
     void shouldThrowWhenRemovingUnknownItem() {
         int unknownItemId = 50;
 
-        assertThatThrownBy(()->cart.removeItem(unknownItemId))
+        assertThatThrownBy(() -> cart.removeItem(unknownItemId))
                 .isInstanceOf(NoSuchElementException.class)
                 .hasMessageContaining(String.valueOf(unknownItemId));
     }
 
     @Test
     void shouldRemoveItem() {
-        cart.addItem(ELECTRONICS,null,QTY);
-        cart.addItem(COMPUTER,COMPUTER_CONFIG,QTY);
+        cart.addItem(ELECTRONICS, null, QTY);
+        cart.addItem(COMPUTER, COMPUTER_CONFIG, QTY);
         long remainingId = cart.getItems().get(0).getItemId();
         long toRemoveId = cart.getItems().get(1).getItemId();
 
@@ -128,8 +129,8 @@ public class CartTest {
 
     @Test
     void shouldCalculateTotal() {
-        cart.addItem(ELECTRONICS,null,9);
-        cart.addItem(COMPUTER,COMPUTER_CONFIG,1);
+        cart.addItem(ELECTRONICS, null, 9);
+        cart.addItem(COMPUTER, COMPUTER_CONFIG, 1);
         CartItem firstItem = cart.getItems().get(0);
         CartItem secondItem = cart.getItems().get(1);
         BigDecimal expectedTotalPriceFirstItem = firstItem.getProduct().getPrice().multiply(BigDecimal.valueOf(firstItem.getQty()));
@@ -143,8 +144,8 @@ public class CartTest {
 
     @Test
     void shouldClearCart() {
-        cart.addItem(ELECTRONICS,null,QTY);
-        cart.addItem(COMPUTER,COMPUTER_CONFIG,QTY);
+        cart.addItem(ELECTRONICS, null, QTY);
+        cart.addItem(COMPUTER, COMPUTER_CONFIG, QTY);
 
         cart.clear();
 
@@ -154,11 +155,46 @@ public class CartTest {
 
     @Test
     void shouldReturnUnmodifiableItems() {
-        cart.addItem(ELECTRONICS,null,QTY);
-        cart.addItem(COMPUTER,COMPUTER_CONFIG,QTY);
+        cart.addItem(ELECTRONICS, null, QTY);
+        cart.addItem(COMPUTER, COMPUTER_CONFIG, QTY);
         CartItem cartItem = new CartItem(100, ELECTRONICS, null, QTY);
 
-        assertThatThrownBy(()->cart.getItems().add(cartItem))
+        assertThatThrownBy(() -> cart.getItems().add(cartItem))
                 .isInstanceOf(UnsupportedOperationException.class);
+    }
+
+    @Test
+    void shouldReturnOrderItemsAndClearCartOnCheckout() {
+        cart.addItem(ELECTRONICS, null, QTY);
+        cart.addItem(COMPUTER, COMPUTER_CONFIG, QTY);
+
+        List<OrderItem> checkout = cart.checkout();
+
+        assertThat(checkout)
+                .containsExactly(
+                        new OrderItem(ELECTRONICS.getId(), ELECTRONICS.getName(), ELECTRONICS.getPrice(), QTY, null),
+                        new OrderItem(COMPUTER.getId(), COMPUTER.getName(), COMPUTER.getPrice(), QTY, COMPUTER_CONFIG)
+                );
+        assertThat(cart.getItems())
+                .isEmpty();
+    }
+
+    @Test
+    void shouldThrowOnEmptyCheckout() {
+        assertThatThrownBy(cart::checkout)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Cart cannot be empty at checkout");
+    }
+
+    @Test
+    void shouldHoldPriceAtCheckout() {
+        Electronics electronics = new Electronics(1, "Electronics", new BigDecimal("10.00"), 100);
+        cart.addItem(electronics, null, QTY);
+        BigDecimal priceAtCheckout = cart.getItems().getFirst().calculateUnitItemPrice();
+        List<OrderItem> checkout = cart.checkout();
+        electronics.setPrice(electronics.getPrice().multiply(new BigDecimal("2")));
+
+        assertThat(checkout.getFirst().price())
+                .isEqualByComparingTo(priceAtCheckout);
     }
 }
