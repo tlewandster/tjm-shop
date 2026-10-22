@@ -3,7 +3,6 @@ package pl.tlewand.shop.model;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -13,6 +12,7 @@ public class CartTest {
     private static final Electronics ELECTRONICS = new Electronics(1, "Electronics", new BigDecimal("10.00"), 100);
     private static final Computer COMPUTER = new Computer(2, "Computer", new BigDecimal("2000.00"), 200, Cpu.AMD_RYZEN_7, Gpu.NVIDIA_RTX_4060, Ram._16GB);
     private static final ComputerConfig COMPUTER_CONFIG = new ComputerConfig(Cpu.AMD_RYZEN_7, Gpu.NVIDIA_RTX_4060, Ram._16GB);
+    private static final Client CLIENT = new Client(1, "Jan Kowalski", "ul.Błotna 69, Podmokle");
     private static final int QTY = 1;
     private final Cart cart = new Cart();
 
@@ -164,24 +164,26 @@ public class CartTest {
     }
 
     @Test
-    void shouldReturnOrderItemsAndClearCartOnCheckout() {
+    void shouldReturnOrderAndClearCartOnCheckout() {
         cart.addItem(ELECTRONICS, null, QTY);
         cart.addItem(COMPUTER, COMPUTER_CONFIG, QTY);
 
-        List<OrderItem> checkout = cart.checkout();
+        Order order = cart.checkout(CLIENT);
 
-        assertThat(checkout)
+        assertThat(order.getOrderItems())
                 .containsExactly(
                         new OrderItem(ELECTRONICS.getId(), ELECTRONICS.getName(), ELECTRONICS.getPrice(), QTY, null),
                         new OrderItem(COMPUTER.getId(), COMPUTER.getName(), COMPUTER.getPrice(), QTY, COMPUTER_CONFIG)
                 );
+        assertThat(order.getClient())
+                .isSameAs(CLIENT);
         assertThat(cart.getItems())
                 .isEmpty();
     }
 
     @Test
     void shouldThrowOnEmptyCheckout() {
-        assertThatThrownBy(cart::checkout)
+        assertThatThrownBy(() -> cart.checkout(CLIENT))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Cart cannot be empty at checkout");
     }
@@ -191,10 +193,25 @@ public class CartTest {
         Electronics electronics = new Electronics(1, "Electronics", new BigDecimal("10.00"), 100);
         cart.addItem(electronics, null, QTY);
         BigDecimal priceAtCheckout = cart.getItems().getFirst().calculateUnitItemPrice();
-        List<OrderItem> checkout = cart.checkout();
+        Order order = cart.checkout(CLIENT);
         electronics.setPrice(electronics.getPrice().multiply(new BigDecimal("2")));
 
-        assertThat(checkout.getFirst().price())
+        assertThat(order.getOrderItems().getFirst().price())
                 .isEqualByComparingTo(priceAtCheckout);
     }
+
+    @Test
+    void shouldThrowNullPointerExceptionWhenClientIsNull() {
+        cart.addItem(ELECTRONICS, null, QTY);
+        cart.addItem(COMPUTER, COMPUTER_CONFIG, QTY);
+
+        assertThatThrownBy(()-> cart.checkout(null))
+                .isInstanceOf(NullPointerException.class)
+                .hasMessage("client cannot be null");
+
+        assertThat(cart.getItems())
+                .isNotEmpty();
+
+    }
+
 }

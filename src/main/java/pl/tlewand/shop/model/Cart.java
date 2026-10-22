@@ -63,8 +63,9 @@ public class Cart {
                 .orElse(BigDecimal.ZERO);
     }
 
-    public List<OrderItem> checkout() {
-        Validate.validState(!items.isEmpty(),"Cart cannot be empty at checkout");
+    public Order checkout(Client client) {
+        Validate.validState(!items.isEmpty(), "Cart cannot be empty at checkout");
+        Validate.notNull(client,"client cannot be null");
         List<OrderItem> orderItems = items.values().stream()
                 .map(cartItem -> new OrderItem(
                         cartItem.getProduct().getId(),
@@ -74,7 +75,8 @@ public class Cart {
                         cartItem.getItemConfig()
                 ))
                 .toList();
+        Order order = new Order(client, orderItems);
         clear();
-        return orderItems;
+        return order;
     }
 }
