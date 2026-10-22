@@ -8,4 +8,7 @@ public record OrderItem(
         BigDecimal price,
         int qty,
         ComputerConfig config) {
+    BigDecimal calculateItemPrice() {
+        return price.multiply(BigDecimal.valueOf(qty));
+    }
 }
