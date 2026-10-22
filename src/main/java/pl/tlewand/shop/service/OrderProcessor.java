@@ -18,7 +18,7 @@ public class OrderProcessor {
         this.productManager = productManager;
     }
 
-    public Invoice processOrder(Order order) {
+    public Invoice process(Order order) {
         if (!areProductsInStock(order)) {
             throw new IllegalStateException("Product out of stock");
         }
