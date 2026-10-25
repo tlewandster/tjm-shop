@@ -7,6 +7,7 @@ import pl.tlewand.shop.service.OrderProcessor;
 import pl.tlewand.shop.service.ProductManager;
 
 import java.math.BigDecimal;
+import java.util.Scanner;
 
 public class Main {
     static void main(String[] args) {
@@ -29,5 +30,56 @@ public class Main {
         new Client(1, "Jan Kunefał", "ul. Krótka 5, 00-001 Warszawa");
         new Client(2, "Anna Krzak", "ul. Długa 12, 10-123 Gdańsk");
         new Client(3, "Piotr Nobody", "ul. Jakaś 7, 20-576 Kraków");
+
+        Scanner scanner = new Scanner(System.in);
+
+        run(scanner);
+    }
+
+    private static void run(Scanner sc) {
+        int choice = 0;
+        do {
+            System.out.println("""
+                    1. Product List
+                    2. Add to Cart
+                    3. View Cart
+                    4. Change your computer's config
+                    5. Place order
+                    0. Quit
+                    """);
+
+            System.out.println("Your choice: ");
+            choice = sc.nextInt();
+            sc.nextLine();
+            switch (choice){
+                case 1 -> productList();
+                case 2 -> addToCart();
+                case 3 -> viewCart();
+                case 4 -> changeConfig();
+                case 5 -> placeOrder();
+                case 0 -> System.out.println("Thank you for shopping with us. Bye.");
+                default -> System.out.println("Incorrect option\n");
+            }
+        } while (choice != 0);
+    }
+
+    private static void placeOrder() {
+
+    }
+
+    private static void changeConfig() {
+
+    }
+
+    private static void viewCart() {
+
+    }
+
+    private static void addToCart() {
+
+    }
+
+    private static void productList() {
+
     }
 }
