@@ -2,6 +2,7 @@ package pl.tlewand.shop.model.order;
 
 import org.apache.commons.lang3.Validate;
 
+import java.time.format.DateTimeFormatter;
 import java.util.stream.Collectors;
 
 public record Invoice(long invoiceNumber, Order order) {
@@ -15,12 +16,15 @@ public record Invoice(long invoiceNumber, Order order) {
         String cartItems = order.getOrderItems().stream()
                 .map(OrderItem::toString)
                 .collect(Collectors.joining("\n"));
+
+        String orderDate = order.getOrderedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
+
         return """
-                Invoice no. %d
+                Invoice no. %d dated %s
                 Buyer: %s
                 Items:
                 %s
                 Total order value: %s
-                """.formatted(invoiceNumber,order.getClient(),cartItems,order.getTotalOrder());
+                """.formatted(invoiceNumber,orderDate, order.getClient(),cartItems,order.getTotalOrder());
     }
 }
