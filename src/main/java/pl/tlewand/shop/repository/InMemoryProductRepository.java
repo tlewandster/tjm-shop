@@ -1,7 +1,7 @@
 package pl.tlewand.shop.repository;
 
 import org.apache.commons.lang3.Validate;
-import pl.tlewand.shop.model.Product;
+import pl.tlewand.shop.model.product.Product;
 
 import java.util.HashMap;
 import java.util.List;

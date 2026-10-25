@@ -1,8 +1,9 @@
-package pl.tlewand.shop.model;
+package pl.tlewand.shop.model.cart;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import pl.tlewand.shop.model.product.*;
 
 import java.math.BigDecimal;
 

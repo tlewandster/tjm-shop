@@ -5,7 +5,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pl.tlewand.shop.model.*;
+import pl.tlewand.shop.model.order.Client;
+import pl.tlewand.shop.model.order.Invoice;
+import pl.tlewand.shop.model.order.Order;
+import pl.tlewand.shop.model.order.OrderItem;
+import pl.tlewand.shop.model.product.Electronics;
 
 import java.math.BigDecimal;
 import java.util.List;

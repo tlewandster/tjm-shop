@@ -1,7 +1,11 @@
-package pl.tlewand.shop.model;
+package pl.tlewand.shop.model.cart;
 
 import lombok.Getter;
 import org.apache.commons.lang3.Validate;
+import pl.tlewand.shop.model.product.Computer;
+import pl.tlewand.shop.model.product.ComputerConfig;
+import pl.tlewand.shop.model.product.Product;
+import pl.tlewand.shop.model.product.Smartphone;
 
 import java.math.BigDecimal;
 

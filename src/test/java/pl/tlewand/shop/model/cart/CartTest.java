@@ -1,6 +1,10 @@
-package pl.tlewand.shop.model;
+package pl.tlewand.shop.model.cart;
 
 import org.junit.jupiter.api.Test;
+import pl.tlewand.shop.model.order.Client;
+import pl.tlewand.shop.model.order.Order;
+import pl.tlewand.shop.model.order.OrderItem;
+import pl.tlewand.shop.model.product.*;
 
 import java.math.BigDecimal;
 import java.util.NoSuchElementException;

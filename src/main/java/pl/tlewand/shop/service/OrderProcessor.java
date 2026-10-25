@@ -1,9 +1,9 @@
 package pl.tlewand.shop.service;
 
 import org.apache.commons.lang3.Validate;
-import pl.tlewand.shop.model.Invoice;
-import pl.tlewand.shop.model.Order;
-import pl.tlewand.shop.model.OrderItem;
+import pl.tlewand.shop.model.order.Invoice;
+import pl.tlewand.shop.model.order.Order;
+import pl.tlewand.shop.model.order.OrderItem;
 
 import java.util.Map;
 import java.util.stream.Collectors;

@@ -1,4 +1,4 @@
-package pl.tlewand.shop.model;
+package pl.tlewand.shop.model.product;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;

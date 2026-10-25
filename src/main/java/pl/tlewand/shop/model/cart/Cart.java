@@ -1,6 +1,12 @@
-package pl.tlewand.shop.model;
+package pl.tlewand.shop.model.cart;
 
 import org.apache.commons.lang3.Validate;
+import pl.tlewand.shop.model.order.Client;
+import pl.tlewand.shop.model.order.Order;
+import pl.tlewand.shop.model.order.OrderItem;
+import pl.tlewand.shop.model.product.Computer;
+import pl.tlewand.shop.model.product.ComputerConfig;
+import pl.tlewand.shop.model.product.Product;
 
 import java.math.BigDecimal;
 import java.util.*;

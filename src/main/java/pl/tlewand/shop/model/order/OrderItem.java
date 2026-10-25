@@ -1,4 +1,6 @@
-package pl.tlewand.shop.model;
+package pl.tlewand.shop.model.order;
+
+import pl.tlewand.shop.model.product.ComputerConfig;
 
 import java.math.BigDecimal;
 

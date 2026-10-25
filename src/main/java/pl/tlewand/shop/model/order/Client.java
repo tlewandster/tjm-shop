@@ -1,4 +1,4 @@
-package pl.tlewand.shop.model;
+package pl.tlewand.shop.model.order;
 
 import org.apache.commons.lang3.Validate;
 

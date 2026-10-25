@@ -5,8 +5,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import pl.tlewand.shop.model.Electronics;
-import pl.tlewand.shop.model.Product;
+import pl.tlewand.shop.model.product.Electronics;
+import pl.tlewand.shop.model.product.Product;
 import pl.tlewand.shop.repository.ProductRepository;
 
 import java.math.BigDecimal;

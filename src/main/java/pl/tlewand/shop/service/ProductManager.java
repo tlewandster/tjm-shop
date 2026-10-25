@@ -1,7 +1,7 @@
 package pl.tlewand.shop.service;
 
 import org.apache.commons.lang3.Validate;
-import pl.tlewand.shop.model.Product;
+import pl.tlewand.shop.model.product.Product;
 import pl.tlewand.shop.repository.ProductRepository;
 
 import java.math.BigDecimal;

@@ -1,4 +1,4 @@
-package pl.tlewand.shop.model;
+package pl.tlewand.shop.model.order;
 
 import lombok.Getter;
 import org.apache.commons.lang3.Validate;

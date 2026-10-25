@@ -1,6 +1,11 @@
 package pl.tlewand.shop;
 
-import pl.tlewand.shop.model.*;
+import pl.tlewand.shop.model.cart.Cart;
+import pl.tlewand.shop.model.cart.CartItem;
+import pl.tlewand.shop.model.order.Client;
+import pl.tlewand.shop.model.order.Invoice;
+import pl.tlewand.shop.model.order.Order;
+import pl.tlewand.shop.model.product.*;
 import pl.tlewand.shop.repository.InMemoryProductRepository;
 import pl.tlewand.shop.repository.ProductRepository;
 import pl.tlewand.shop.service.OrderProcessor;

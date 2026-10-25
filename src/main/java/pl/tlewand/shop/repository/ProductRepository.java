@@ -1,6 +1,6 @@
 package pl.tlewand.shop.repository;
 
-import pl.tlewand.shop.model.Product;
+import pl.tlewand.shop.model.product.Product;
 
 import java.util.List;
 import java.util.Optional;

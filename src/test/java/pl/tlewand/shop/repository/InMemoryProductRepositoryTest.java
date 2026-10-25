@@ -1,8 +1,8 @@
 package pl.tlewand.shop.repository;
 
 import org.junit.jupiter.api.Test;
-import pl.tlewand.shop.model.Electronics;
-import pl.tlewand.shop.model.Product;
+import pl.tlewand.shop.model.product.Electronics;
+import pl.tlewand.shop.model.product.Product;
 
 import java.math.BigDecimal;
 import java.util.List;
