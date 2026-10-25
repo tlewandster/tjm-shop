@@ -21,7 +21,7 @@ public class CartItemTest {
         CartItem cartItem = new CartItem(ITEM_ID, COMPUTER, COMPUTER_CONFIG, QTY);
 
         assertThat(cartItem.getItemId()).isEqualTo(ITEM_ID);
-        assertThat(cartItem.getProduct()).isEqualTo(ELECTRONICS);
+        assertThat(cartItem.getProduct()).isEqualTo(COMPUTER);
         assertThat(cartItem.getItemConfig()).isEqualTo(COMPUTER_CONFIG);
         assertThat(cartItem.getQty()).isEqualTo(QTY);
     }
