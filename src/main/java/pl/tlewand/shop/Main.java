@@ -7,9 +7,13 @@ import pl.tlewand.shop.service.OrderProcessor;
 import pl.tlewand.shop.service.ProductManager;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
+    private static final Scanner sc = new Scanner(System.in);
+
     static void main(String[] args) {
         ProductRepository productRepository = new InMemoryProductRepository();
         ProductManager productManager = new ProductManager(productRepository);
@@ -30,12 +34,10 @@ public class Main {
         Client client = (new Client(1, "Jan Kunefał", "ul. Krótka 5, 00-001 Warszawa"));
         Cart cart = new Cart();
 
-        Scanner scanner = new Scanner(System.in);
-
-        run(scanner, productManager, orderProcessor);
+        run(productManager, orderProcessor, cart, client);
     }
 
-    private static void run(Scanner sc, ProductManager productManager, OrderProcessor orderProcessor) {
+    private static void run(ProductManager productManager, OrderProcessor orderProcessor, Cart cart, Client client) {
         int choice = 0;
         do {
             System.out.println("""
@@ -48,37 +50,125 @@ public class Main {
                     """);
 
             System.out.println("Your choice: ");
-            choice = sc.nextInt();
-            sc.nextLine();
-            switch (choice) {
-                case 1 -> productList();
-                case 2 -> addToCart();
-                case 3 -> viewCart();
-                case 4 -> changeConfig();
-                case 5 -> placeOrder();
-                case 0 -> System.out.println("Thank you for shopping with us. Bye.");
-                default -> System.out.println("Incorrect option\n");
+            try {
+                choice = sc.nextInt();
+                sc.nextLine();
+                switch (choice) {
+                    case 1 -> productList(productManager);
+                    case 2 -> addToCart(cart, productManager);
+                    case 3 -> viewCart(cart);
+                    case 4 -> changeConfig(cart);
+                    case 5 -> placeOrder(cart,client,orderProcessor);
+                    case 0 -> System.out.println("Thank you for shopping with us. Bye.");
+                    default -> System.out.println("Incorrect option\n");
+                }
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
             }
         } while (choice != 0);
     }
 
-    private static void placeOrder() {
-
+    private static void placeOrder(Cart cart, Client client, OrderProcessor orderProcessor) {
+        Order order = cart.checkout(client);
+        Invoice invoice = orderProcessor.process(order);
+        System.out.println(invoice);
     }
 
-    private static void changeConfig() {
+    private static void changeConfig(Cart cart) {
+        List<CartItem> computers = cart.getItems().stream()
+                .filter(cartItem -> cartItem.getItemConfig() != null)
+                .toList();
 
+        if (computers.isEmpty()) {
+            System.out.println("You don't have any computers in your cart");
+            return;
+        } else {
+            System.out.println("Select the computer on which you want to change configuration:");
+            computers.forEach(cartItem -> System.out.println(cartItem.toString()));
+        }
+        long id = sc.nextLong();
+        // Select a new configuration; the current one is...
+        CartItem selectedItem = computers.stream()
+                .filter(cartItem -> cartItem.getItemId() == id)
+                .findFirst()
+                .get();
+        // Select a new configuration; the current one is...
+        System.out.println("Select a new configuration. Current one is " + selectedItem.getItemConfig());
+        ComputerConfig newConfig = selectNewConfig();
+        cart.removeItem(selectedItem.getItemId());
+        cart.addItem(selectedItem.getProduct(),newConfig, selectedItem.getQty());
     }
 
-    private static void viewCart() {
-
+    private static ComputerConfig selectNewConfig() {
+        Cpu newCpu = getNewCpu();
+        Gpu newGpu = getNewGpu();
+        Ram newRam = getNewRam();
+        return new ComputerConfig(newCpu, newGpu, newRam);
     }
 
-    private static void addToCart() {
-
+    private static Cpu getNewCpu() {
+        System.out.println("Select CPU:");
+        Arrays.stream(Cpu.values()).forEach(cpu -> System.out.println(cpu.ordinal() + 1 + ". " + cpu.name()));
+        int cpuChoice = sc.nextInt();
+        Cpu newCpu = switch (cpuChoice) {
+            case 1 -> Cpu.INTEL_I5;
+            case 2 -> Cpu.INTEL_I7;
+            case 3 -> Cpu.AMD_RYZEN_5;
+            case 4 -> Cpu.AMD_RYZEN_7;
+            case 5 -> Cpu.AMD_RYZEN_9;
+            default -> throw new IllegalStateException("Unexpected value: " + cpuChoice);
+        };
+        return newCpu;
     }
 
-    private static void productList() {
+    private static Gpu getNewGpu() {
+        System.out.println("Select GPU:");
+        Arrays.stream(Gpu.values()).forEach(gpu -> System.out.println(gpu.ordinal() + 1 + ". " + gpu.name()));
+        int gpuChoice = sc.nextInt();
+        Gpu newGpu = switch (gpuChoice) {
+            case 1 -> Gpu.NVIDIA_RTX_4060;
+            case 2 -> Gpu.NVIDIA_RTX_4070;
+            case 3 -> Gpu.NVIDIA_RTX_4080;
+            case 4 -> Gpu.AMD_RX_7700;
+            case 5 -> Gpu.AMD_RX_7900;
+            default -> throw new IllegalStateException("Unexpected value: " + gpuChoice);
+        };
+        return newGpu;
+    }
 
+    private static Ram getNewRam() {
+        System.out.println("Select RAM:");
+        Arrays.stream(Ram.values()).forEach(ram -> System.out.println(ram.ordinal() + 1 + ". " + ram.name()));
+        int ramChoice = sc.nextInt();
+        Ram newRam = switch (ramChoice) {
+            case 1 -> Ram._16GB;
+            case 2 -> Ram._32GB;
+            case 3 -> Ram._64GB;
+            default -> throw new IllegalStateException("Unexpected value: " + ramChoice);
+        };
+        return newRam;
+    }
+
+    private static void viewCart(Cart cart) {
+        cart.getItems()
+                .forEach(cartItem -> System.out.println(cartItem.toString()));
+        System.out.println("Total cart value: " + cart.totalPrice());
+    }
+
+    private static void addToCart(Cart cart, ProductManager productManager) {
+        System.out.println("Which product add to  cart?");
+        long productId = sc.nextLong();
+        System.out.println("How many?");
+        int qty = sc.nextInt();
+        Product product = productManager.find(productId);
+        ComputerConfig config = product instanceof Computer computer ? new ComputerConfig(computer.getCpu(), computer.getGpu(), computer.getRam()) : null;
+        cart.addItem(product, config, qty);
+        System.out.printf("Added to cart %d pcs.:\n%s\n", qty, product.toString());
+    }
+
+    private static void productList(ProductManager productManager) {
+        productManager.findAll()
+                .forEach(product -> System.out.println(product.toString()));
+        System.out.println();
     }
 }

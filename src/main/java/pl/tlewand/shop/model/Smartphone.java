@@ -17,4 +17,9 @@ public class Smartphone extends Product{
         this.colour = colour;
         this.batteryCapacityMah = batteryCapacityMah;
     }
+
+    @Override
+    public String toString() {
+        return "%d - Smartphone %s (%s, %d mAh) - %s PLN - %d in stock".formatted(getId(), getName(), getColour(), getBatteryCapacityMah(), getPrice(), getStock());
+    }
 }

@@ -6,7 +6,7 @@ import org.apache.commons.lang3.Validate;
 import java.math.BigDecimal;
 
 @Getter
-public class Computer extends Product{
+public class Computer extends Product {
     @Getter
     private final Cpu cpu;
     private final Gpu gpu;
@@ -20,5 +20,10 @@ public class Computer extends Product{
         this.cpu = cpu;
         this.gpu = gpu;
         this.ram = ram;
+    }
+
+    @Override
+    public String toString() {
+        return "%d - Computer %s (%s, %s, %s) - %s PLN - %d in stock".formatted(getId(), getName(), getCpu(), getGpu(), getRam(), getPrice(), getStock());
     }
 }

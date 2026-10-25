@@ -4,8 +4,9 @@ import lombok.Getter;
 import org.apache.commons.lang3.Validate;
 
 import java.math.BigDecimal;
+
 @Getter
-class CartItem {
+public class CartItem {
     private final long itemId;
     private final Product product;
     private final ComputerConfig itemConfig;
@@ -23,7 +24,7 @@ class CartItem {
         this.qty += qty;
     }
 
-    BigDecimal calculateUnitItemPrice() {
+    public BigDecimal calculateUnitItemPrice() {
         BigDecimal price = product.getPrice();
         if (product instanceof Computer computer) {
             BigDecimal cpuPriceDifference = itemConfig.cpu().getPrice().subtract(computer.getCpu().getPrice());
@@ -33,5 +34,23 @@ class CartItem {
             price = product.getPrice().add(totalConfigPriceDifference);
         }
         return price;
+    }
+
+    @Override
+    public String toString() {
+        String description = "";
+        if (product instanceof Computer computer) {
+            description = "(%s, %s, %s)".formatted(itemConfig.cpu(), itemConfig.gpu(), itemConfig.ram());
+        } else if (product instanceof Smartphone smartphone) {
+            description = "(%s, %smAh)".formatted(smartphone.getColour(), smartphone.getBatteryCapacityMah());
+        }
+        return "%d - %s%s - %d x %s - %s".formatted(
+                itemId,
+                product.getName(),
+                description,
+                qty,
+                calculateUnitItemPrice(),
+                calculateUnitItemPrice().multiply(new BigDecimal(qty))
+        );
     }
 }

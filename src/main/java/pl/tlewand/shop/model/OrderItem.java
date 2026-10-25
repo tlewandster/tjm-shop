@@ -11,4 +11,15 @@ public record OrderItem(
     BigDecimal calculateItemPrice() {
         return price.multiply(BigDecimal.valueOf(qty));
     }
+
+    @Override
+    public String toString() {
+        return "%s (%s) - %d x %s -> %s".formatted(
+                name(),
+                config(),
+                qty(),
+                price(),
+                price().multiply(BigDecimal.valueOf(qty()))
+        );
+    }
 }
