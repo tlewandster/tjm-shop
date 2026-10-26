@@ -49,9 +49,10 @@ public class Main {
             System.out.println("""
                     1. Product List
                     2. Add to Cart
-                    3. View Cart
-                    4. Change your computer's config
-                    5. Place order
+                    3. Remove from cart
+                    4. View Cart
+                    5. Change your computer's config
+                    6. Place order
                     0. Quit
                     """);
 
@@ -62,9 +63,10 @@ public class Main {
                 switch (choice) {
                     case 1 -> productList(productManager);
                     case 2 -> addToCart(cart, productManager);
-                    case 3 -> viewCart(cart);
-                    case 4 -> changeConfig(cart);
-                    case 5 -> placeOrder(cart, client, orderProcessor);
+                    case 3 -> removeFromCart(cart);
+                    case 4 -> viewCart(cart);
+                    case 5 -> changeConfig(cart);
+                    case 6 -> placeOrder(cart, client, orderProcessor);
                     case 0 -> System.out.println("Thank you for shopping with us. Bye.");
                     default -> System.out.println("Incorrect option\n");
                 }
@@ -74,6 +76,14 @@ public class Main {
                 System.out.println(e.getMessage());
             }
         } while (choice != 0);
+    }
+
+    private static void removeFromCart(Cart cart) {
+        viewCart(cart);
+        System.out.println("Which item remove from cart?");
+        long itemId = sc.nextLong();
+        cart.removeItem(itemId);
+        System.out.println("Removed");
     }
 
     private static void placeOrder(Cart cart, Client client, OrderProcessor orderProcessor) {
@@ -95,12 +105,11 @@ public class Main {
             computers.forEach(cartItem -> System.out.println(cartItem.toString()));
         }
         long id = sc.nextLong();
-        // Select a new configuration; the current one is...
         CartItem selectedItem = computers.stream()
                 .filter(cartItem -> cartItem.getItemId() == id)
                 .findFirst()
                 .get();
-        // Select a new configuration; the current one is...
+
         System.out.println("Select a new configuration. Current one is " + selectedItem.getItemConfig());
         ComputerConfig newConfig = selectNewConfig();
         cart.removeItem(selectedItem.getItemId());
@@ -164,7 +173,7 @@ public class Main {
     }
 
     private static void addToCart(Cart cart, ProductManager productManager) {
-        System.out.println("Which product add to  cart?");
+        System.out.println("Which product add to cart?");
         long productId = sc.nextLong();
         System.out.println("How many?");
         int qty = sc.nextInt();
