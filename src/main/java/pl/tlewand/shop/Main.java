@@ -1,5 +1,6 @@
 package pl.tlewand.shop;
 
+import pl.tlewand.shop.exception.OutOfStockException;
 import pl.tlewand.shop.model.cart.Cart;
 import pl.tlewand.shop.model.cart.CartItem;
 import pl.tlewand.shop.model.order.Client;
@@ -63,10 +64,12 @@ public class Main {
                     case 2 -> addToCart(cart, productManager);
                     case 3 -> viewCart(cart);
                     case 4 -> changeConfig(cart);
-                    case 5 -> placeOrder(cart,client,orderProcessor);
+                    case 5 -> placeOrder(cart, client, orderProcessor);
                     case 0 -> System.out.println("Thank you for shopping with us. Bye.");
                     default -> System.out.println("Incorrect option\n");
                 }
+            } catch (OutOfStockException e) {
+                System.out.println("Out of stock: " + e.getMessage());
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
@@ -101,7 +104,7 @@ public class Main {
         System.out.println("Select a new configuration. Current one is " + selectedItem.getItemConfig());
         ComputerConfig newConfig = selectNewConfig();
         cart.removeItem(selectedItem.getItemId());
-        cart.addItem(selectedItem.getProduct(),newConfig, selectedItem.getQty());
+        cart.addItem(selectedItem.getProduct(), newConfig, selectedItem.getQty());
     }
 
     private static ComputerConfig selectNewConfig() {

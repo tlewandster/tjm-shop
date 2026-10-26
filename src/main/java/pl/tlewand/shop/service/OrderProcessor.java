@@ -1,9 +1,11 @@
 package pl.tlewand.shop.service;
 
 import org.apache.commons.lang3.Validate;
+import pl.tlewand.shop.exception.OutOfStockException;
 import pl.tlewand.shop.model.order.Invoice;
 import pl.tlewand.shop.model.order.Order;
 import pl.tlewand.shop.model.order.OrderItem;
+import pl.tlewand.shop.model.product.Product;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,16 +21,20 @@ public class OrderProcessor {
     }
 
     public Invoice process(Order order) {
-        if (!areProductsInStock(order)) {
-            throw new IllegalStateException("Product out of stock");
-        }
+        validateStock(order);
         reduceStocks(order);
         return generateInvoice(order);
     }
 
-    private boolean areProductsInStock(Order order) {
-        return getStreamIdQtyFrom(order).allMatch((entry) ->
-                productManager.find(entry.getKey()).getStock() >= entry.getValue());
+    private void validateStock(Order order) {
+        getStreamIdQtyFrom(order).forEach(entry -> {
+            Product product = productManager.find(entry.getKey());
+            int stock = product.getStock();
+            Integer requestedQty = entry.getValue();
+            if (requestedQty > stock) {
+                throw new OutOfStockException("Requested quantity (%d pcs. %s) exceeds the current stock (%d)".formatted(requestedQty, product.getName(), stock));
+            }
+        });
     }
 
     private void reduceStocks(Order order) {
@@ -38,7 +44,6 @@ public class OrderProcessor {
             int newStock = productManager.find(productId).getStock() - qty;
             productManager.updateStock(productId, newStock);
         });
-
     }
 
     private Stream<Map.Entry<Long, Integer>> getStreamIdQtyFrom(Order order) {

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import pl.tlewand.shop.exception.OutOfStockException;
 import pl.tlewand.shop.model.order.Client;
 import pl.tlewand.shop.model.order.Invoice;
 import pl.tlewand.shop.model.order.Order;
@@ -47,8 +48,8 @@ class OrderProcessorTest {
         when(productManager.find(1)).thenReturn(product);
 
         assertThatThrownBy(() -> orderProcessor.process(ORDER))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Product out of stock");
+                .isInstanceOf(OutOfStockException.class)
+                .hasMessageContaining(product.getName());
 
         verify(productManager, never()).updateStock(anyLong(), anyInt());
     }
@@ -64,8 +65,8 @@ class OrderProcessorTest {
         when(productManager.find(1)).thenReturn(product);
 
         assertThatThrownBy(() -> orderProcessor.process(order))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Product out of stock");
+                .isInstanceOf(OutOfStockException.class)
+                .hasMessageContaining(product.getName());
 
         verify(productManager, never()).updateStock(anyLong(), anyInt());
     }

@@ -1,6 +1,7 @@
 package pl.tlewand.shop.model.cart;
 
 import org.apache.commons.lang3.Validate;
+import pl.tlewand.shop.exception.OutOfStockException;
 import pl.tlewand.shop.model.order.Client;
 import pl.tlewand.shop.model.order.Order;
 import pl.tlewand.shop.model.order.OrderItem;
@@ -28,8 +29,10 @@ public class Cart {
         int summaryQtySameItemsInCart = items.values().stream()
                 .filter(cartItem -> cartItem.getProduct().getId() == product.getId())
                 .mapToInt(CartItem::getQty).sum();
-        if ((summaryQtySameItemsInCart + qty) > product.getStock()) {
-            throw new IllegalStateException("Qty exceeds stock");
+        int requestedQty = summaryQtySameItemsInCart + qty;
+        int stock = product.getStock();
+        if (requestedQty > stock) {
+            throw new OutOfStockException("Requested quantity (%d pcs. %s) exceeds the current stock (%d)".formatted(requestedQty, product.getName(), stock));
         }
 
         Optional<CartItem> sameItemInCart = items.values().stream()
@@ -71,7 +74,7 @@ public class Cart {
 
     public Order checkout(Client client) {
         Validate.validState(!items.isEmpty(), "Cart cannot be empty at checkout");
-        Validate.notNull(client,"client cannot be null");
+        Validate.notNull(client, "client cannot be null");
         List<OrderItem> orderItems = items.values().stream()
                 .map(cartItem -> new OrderItem(
                         cartItem.getProduct().getId(),

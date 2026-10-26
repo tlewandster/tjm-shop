@@ -1,6 +1,7 @@
 package pl.tlewand.shop.model.cart;
 
 import org.junit.jupiter.api.Test;
+import pl.tlewand.shop.exception.OutOfStockException;
 import pl.tlewand.shop.model.order.Client;
 import pl.tlewand.shop.model.order.Order;
 import pl.tlewand.shop.model.order.OrderItem;
@@ -61,8 +62,8 @@ public class CartTest {
         int qtyExceedsStock = ELECTRONICS.getStock() + 5;
 
         assertThatThrownBy(() -> cart.addItem(ELECTRONICS, null, qtyExceedsStock))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Qty exceeds stock");
+                .isInstanceOf(OutOfStockException.class)
+                .hasMessageContaining(ELECTRONICS.getName());
     }
 
     @Test
@@ -71,8 +72,8 @@ public class CartTest {
         int qtyExceedsStock = ELECTRONICS.getStock();
 
         assertThatThrownBy(() -> cart.addItem(ELECTRONICS, null, qtyExceedsStock))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Qty exceeds stock");
+                .isInstanceOf(OutOfStockException.class)
+                .hasMessageContaining(ELECTRONICS.getName());
     }
 
     @Test
