@@ -11,8 +11,11 @@ import pl.tlewand.shop.repository.InMemoryProductRepository;
 import pl.tlewand.shop.repository.ProductRepository;
 import pl.tlewand.shop.service.OrderProcessor;
 import pl.tlewand.shop.service.ProductManager;
+import pl.tlewand.shop.service.StockService;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
@@ -20,10 +23,13 @@ import java.util.Scanner;
 public class Main {
     private static final Scanner sc = new Scanner(System.in);
 
-    static void main(String[] args) {
+    static void main(String[] args) throws IOException {
         ProductRepository productRepository = new InMemoryProductRepository();
         ProductManager productManager = new ProductManager(productRepository);
         OrderProcessor orderProcessor = new OrderProcessor(productManager);
+        StockService stockService = new StockService();
+        Path dataDir = Path.of("data");
+        Path stockStorageFile = dataDir.resolve("stock.txt");
 
         productManager.add(new Computer(1, "Lenovo Legion 5", new BigDecimal("5999.00"), 5, Cpu.AMD_RYZEN_7, Gpu.NVIDIA_RTX_4060, Ram._16GB));
         productManager.add(new Computer(2, "ASUS ROG Strix G16", new BigDecimal("8499.00"), 3, Cpu.INTEL_I7, Gpu.NVIDIA_RTX_4070, Ram._32GB));
@@ -39,8 +45,10 @@ public class Main {
 
         Client client = (new Client(1, "Jan Kunefał", "ul. Krótka 5, 00-001 Warszawa"));
         Cart cart = new Cart();
+        StockService.load(stockStorageFile, productManager);
 
         run(productManager, orderProcessor, cart, client);
+        StockService.save(stockStorageFile, productManager);
     }
 
     private static void run(ProductManager productManager, OrderProcessor orderProcessor, Cart cart, Client client) {
