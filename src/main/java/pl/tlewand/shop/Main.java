@@ -12,6 +12,7 @@ import pl.tlewand.shop.repository.ProductRepository;
 import pl.tlewand.shop.service.OrderProcessor;
 import pl.tlewand.shop.service.ProductManager;
 import pl.tlewand.shop.service.StockService;
+import pl.tlewand.shop.storage.FileStorage;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -23,11 +24,11 @@ import java.util.Scanner;
 public class Main {
     private static final Scanner sc = new Scanner(System.in);
 
-    static void main(String[] args) throws IOException {
+    static void main(String[] args) {
         ProductRepository productRepository = new InMemoryProductRepository();
         ProductManager productManager = new ProductManager(productRepository);
         OrderProcessor orderProcessor = new OrderProcessor(productManager);
-        StockService stockService = new StockService();
+        StockService stockService = new StockService(new FileStorage());
         Path dataDir = Path.of("data");
         Path stockStorageFile = dataDir.resolve("stock.txt");
 
@@ -45,10 +46,18 @@ public class Main {
 
         Client client = (new Client(1, "Jan Kunefał", "ul. Krótka 5, 00-001 Warszawa"));
         Cart cart = new Cart();
-        StockService.load(stockStorageFile, productManager);
+        try {
+            stockService.load(stockStorageFile, productManager);
+        } catch (IOException e) {
+            System.out.println("Problem reading file " + stockStorageFile + ". " + e.getMessage());
+        }
 
         run(productManager, orderProcessor, cart, client);
-        StockService.save(stockStorageFile, productManager);
+        try {
+            stockService.save(stockStorageFile, productManager);
+        } catch (IOException e) {
+            System.out.println("Problem writing to file " + stockStorageFile + ". " + e.getMessage());
+        }
     }
 
     private static void run(ProductManager productManager, OrderProcessor orderProcessor, Cart cart, Client client) {
