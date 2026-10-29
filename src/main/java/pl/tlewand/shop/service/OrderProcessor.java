@@ -22,8 +22,17 @@ public class OrderProcessor {
 
     public Invoice process(Order order) {
         validateStock(order);
+        simulateLongOrderProcessing(200);
         reduceStocks(order);
         return generateInvoice(order);
+    }
+
+    private void simulateLongOrderProcessing(long timeInMillis) {
+        try {
+            Thread.sleep(timeInMillis);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     private void validateStock(Order order) {
