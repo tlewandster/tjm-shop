@@ -11,9 +11,13 @@ import pl.tlewand.shop.model.order.Invoice;
 import pl.tlewand.shop.model.order.Order;
 import pl.tlewand.shop.model.order.OrderItem;
 import pl.tlewand.shop.model.product.Electronics;
+import pl.tlewand.shop.model.product.Product;
 
 import java.math.BigDecimal;
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -50,7 +54,6 @@ class OrderProcessorTest {
         assertThatThrownBy(() -> orderProcessor.process(ORDER))
                 .isInstanceOf(OutOfStockException.class)
                 .hasMessageContaining(product.getName());
-
         verify(productManager, never()).updateStock(anyLong(), anyInt());
     }
 
@@ -69,5 +72,22 @@ class OrderProcessorTest {
                 .hasMessageContaining(product.getName());
 
         verify(productManager, never()).updateStock(anyLong(), anyInt());
+    }
+
+    @Test
+    void shouldProcessSeriesOfOrdersSynchronously() {
+        List<Order> orders = new ArrayList<>();
+        Client client = new Client(1,"Jaś Kunefał", "Mars");
+        Product product = new Electronics(13,"Electronics",BigDecimal.valueOf(100),10);
+        OrderItem orderItem = new OrderItem(1, "prod1", new BigDecimal("10.50"), 4, null);
+        IntStream.rangeClosed(1, 100)
+                .forEach(i -> orders.add(new Order(client, List.of(orderItem))));
+        when(productManager.find(anyLong())).thenReturn(product);
+        long before = System.nanoTime();
+
+        orderProcessor.processOrdersSync(orders);
+
+        long after = System.nanoTime();
+        System.out.println(Duration.ofNanos(after-before));
     }
 }
