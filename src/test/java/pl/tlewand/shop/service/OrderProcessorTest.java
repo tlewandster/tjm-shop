@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -75,7 +76,7 @@ class OrderProcessorTest {
     }
 
     @Test
-    void shouldProcessSeriesOfOrdersSynchronously() {
+    void shouldProcessSeriesOfOrdersSyncAndAsync() throws ExecutionException, InterruptedException {
         List<Order> orders = new ArrayList<>();
         Client client = new Client(1,"Jaś Kunefał", "Mars");
         Product product = new Electronics(13,"Electronics",BigDecimal.valueOf(100),10);
@@ -83,11 +84,21 @@ class OrderProcessorTest {
         IntStream.rangeClosed(1, 100)
                 .forEach(i -> orders.add(new Order(client, List.of(orderItem))));
         when(productManager.find(anyLong())).thenReturn(product);
-        long before = System.nanoTime();
 
-        orderProcessor.processOrdersSync(orders);
+        long syncBefore = System.nanoTime();
+        List<Invoice> syncInvoices = orderProcessor.processOrdersSync(orders);
+        long syncAfter = System.nanoTime();
+        Duration syncDuration = Duration.ofNanos(syncAfter - syncBefore);
+        System.out.println("Sync -> " + syncDuration);
 
-        long after = System.nanoTime();
-        System.out.println(Duration.ofNanos(after-before));
+        long asyncBefore = System.nanoTime();
+        List<Invoice> asyncInvoices = orderProcessor.processOrdersAsync(orders);
+        long asyncAfter = System.nanoTime();
+        Duration asyncDuration = Duration.ofNanos(asyncAfter - asyncBefore);
+        System.out.println("Async -> " + asyncDuration);
+
+        assertThat(syncInvoices.size()).isEqualTo(orders.size());
+        assertThat(asyncInvoices.size()).isEqualTo(orders.size());
+        assertThat(syncDuration).isGreaterThan(asyncDuration);
     }
 }
