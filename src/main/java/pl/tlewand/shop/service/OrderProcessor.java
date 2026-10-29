@@ -7,6 +7,8 @@ import pl.tlewand.shop.model.order.Order;
 import pl.tlewand.shop.model.order.OrderItem;
 import pl.tlewand.shop.model.product.Product;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -18,6 +20,14 @@ public class OrderProcessor {
     public OrderProcessor(ProductManager productManager) {
         Validate.notNull(productManager, "productManager can not be null");
         this.productManager = productManager;
+    }
+
+    public List<Invoice> processOrdersSync(List<Order> orders) {
+        List<Invoice> invoices = new ArrayList<>();
+        for (Order order : orders) {
+            invoices.add(process(order));
+        }
+        return invoices;
     }
 
     public Invoice process(Order order) {
