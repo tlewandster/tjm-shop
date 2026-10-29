@@ -10,6 +10,7 @@ import pl.tlewand.shop.model.product.Product;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -28,6 +29,22 @@ public class OrderProcessor {
             invoices.add(process(order));
         }
         return invoices;
+    }
+
+    public List<Invoice> processOrdersAsync(List<Order> orders) throws InterruptedException, ExecutionException {
+        List<Callable<Invoice>> tasks = new ArrayList<>();
+        for (Order order : orders) {
+            tasks.add(() -> process(order));
+        }
+        try (ExecutorService pool = Executors.newFixedThreadPool(10)) {
+            List<Future<Invoice>> futureInvoices = pool.invokeAll(tasks);
+            List<Invoice> invoices = new ArrayList<>();
+            for (Future<Invoice> futureInvoice : futureInvoices) {
+                invoices.add(futureInvoice.get());
+            }
+            return invoices;
+        }
+
     }
 
     public Invoice process(Order order) {
