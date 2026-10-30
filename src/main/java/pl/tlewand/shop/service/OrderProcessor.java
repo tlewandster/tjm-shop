@@ -49,9 +49,8 @@ public class OrderProcessor {
     }
 
     public Invoice process(Order order) {
-        validateStock(order);
+        validateAndReduceStock(order);
         simulateLongOrderProcessing(200);
-        reduceStocks(order);
         return generateInvoice(order);
     }
 
@@ -61,6 +60,11 @@ public class OrderProcessor {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    private synchronized void validateAndReduceStock(Order order){
+        validateStock(order);
+        reduceStocks(order);
     }
 
     private void validateStock(Order order) {
