@@ -11,12 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class OrderProcessor {
     private final ProductManager productManager;
-    private long invoiceNumber = 0;
+    private final AtomicLong invoiceNumber = new AtomicLong(0);
 
     public OrderProcessor(ProductManager productManager) {
         Validate.notNull(productManager, "productManager can not be null");
@@ -89,6 +90,6 @@ public class OrderProcessor {
     }
 
     private Invoice generateInvoice(Order order) {
-        return new Invoice(++invoiceNumber, order);
+        return new Invoice(invoiceNumber.incrementAndGet(), order);
     }
 }
