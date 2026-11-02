@@ -12,11 +12,10 @@ public class NightDiscount implements DiscountPolicy {
 
     @Override
     public BigDecimal allowedDiscount(LocalTime orderTime, BigDecimal totalOrder, Code discountCode) {
+
+        validate(orderTime, totalOrder, discountCode);
         if (orderTime.isAfter(startTime) && orderTime.isBefore(endTime)) {
-            return totalOrder
-                    .multiply(BigDecimal.valueOf(discountPercent))
-                    .divide(new BigDecimal("100"))
-                    .setScale(2,RoundingMode.HALF_UP);
+            calculateDiscount(totalOrder, discountPercent);
         }
         return BigDecimal.ZERO;
     }
