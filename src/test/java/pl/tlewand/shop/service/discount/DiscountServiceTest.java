@@ -2,7 +2,6 @@ package pl.tlewand.shop.service.discount;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -18,13 +17,12 @@ import static org.mockito.Mockito.when;
 class DiscountServiceTest {
 
     @Mock
-    DiscountPolicy codeDiscount = new CodeDiscount();
+    DiscountPolicy codeDiscount;
 
     @Mock
-    DiscountPolicy nightDiscount = new NightDiscount();
+    DiscountPolicy nightDiscount;
 
-    @InjectMocks
-    DiscountService discountService = new DiscountService(List.of(codeDiscount, nightDiscount));
+    DiscountService discountService;
 
     LocalTime orderTime = LocalTime.of(3, 0);
     BigDecimal totalOrder = new BigDecimal("123.45");
@@ -32,8 +30,9 @@ class DiscountServiceTest {
 
     @Test
     void shouldGetBestDiscountValue() {
-        when(codeDiscount.allowedDiscount(any(),any(),any())).thenReturn(new BigDecimal("100.00"));
-        when(nightDiscount.allowedDiscount(any(),any(),any())).thenReturn(new BigDecimal("50.00"));
+        discountService = new DiscountService(List.of(codeDiscount,nightDiscount));
+        when(codeDiscount.allowedDiscount(any(),any(),any())).thenReturn(new BigDecimal("50.00"));
+        when(nightDiscount.allowedDiscount(any(),any(),any())).thenReturn(new BigDecimal("100.00"));
 
         BigDecimal result = discountService.getBestDiscountValue(orderTime, totalOrder, discountCode);
 
