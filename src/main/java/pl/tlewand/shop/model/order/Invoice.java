@@ -25,6 +25,8 @@ public record Invoice(long invoiceNumber, Order order) {
                 Items:
                 %s
                 Total order value: %s
-                """.formatted(invoiceNumber,orderDate, order.getClient(),cartItems,order.getTotalOrder());
+                Discount value: %s
+                Total due: %s
+                """.formatted(invoiceNumber,orderDate, order.getClient(),cartItems,order.getTotalOrder(), order.getDiscountAmount(), order.getTotalDue());
     }
 }

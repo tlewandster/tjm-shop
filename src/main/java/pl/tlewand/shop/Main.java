@@ -12,6 +12,10 @@ import pl.tlewand.shop.repository.ProductRepository;
 import pl.tlewand.shop.service.OrderProcessor;
 import pl.tlewand.shop.service.ProductManager;
 import pl.tlewand.shop.service.StockService;
+import pl.tlewand.shop.service.discount.Code;
+import pl.tlewand.shop.service.discount.CodeDiscount;
+import pl.tlewand.shop.service.discount.DiscountService;
+import pl.tlewand.shop.service.discount.NightDiscount;
 import pl.tlewand.shop.storage.FileStorage;
 
 import java.io.IOException;
@@ -46,13 +50,14 @@ public class Main {
 
         Client client = (new Client(1, "Jan Kunefał", "ul. Krótka 5, 00-001 Warszawa"));
         Cart cart = new Cart();
+        DiscountService discountService = new DiscountService(List.of(new CodeDiscount(), new NightDiscount()));
         try {
             stockService.load(stockStorageFile, productManager);
         } catch (IOException e) {
             System.out.println("Problem reading file " + stockStorageFile + ". " + e.getMessage());
         }
 
-        run(productManager, orderProcessor, cart, client);
+        run(productManager, orderProcessor, cart, client, discountService);
         try {
             stockService.save(stockStorageFile, productManager);
         } catch (IOException e) {
@@ -60,7 +65,7 @@ public class Main {
         }
     }
 
-    private static void run(ProductManager productManager, OrderProcessor orderProcessor, Cart cart, Client client) {
+    private static void run(ProductManager productManager, OrderProcessor orderProcessor, Cart cart, Client client, DiscountService discountService) {
         int choice = 0;
         do {
             System.out.println("""
@@ -83,7 +88,7 @@ public class Main {
                     case 3 -> removeFromCart(cart);
                     case 4 -> viewCart(cart);
                     case 5 -> changeConfig(cart);
-                    case 6 -> placeOrder(cart, client, orderProcessor);
+                    case 6 -> placeOrder(cart, client, orderProcessor, discountService);
                     case 0 -> System.out.println("Thank you for shopping with us. Bye.");
                     default -> System.out.println("Incorrect option\n");
                 }
@@ -103,8 +108,17 @@ public class Main {
         System.out.println("Removed");
     }
 
-    private static void placeOrder(Cart cart, Client client, OrderProcessor orderProcessor) {
+    private static void placeOrder(Cart cart, Client client, OrderProcessor orderProcessor, DiscountService discountService) {
+        Code userCode;
+        System.out.println("Enter discount code: ");
+        try {
+            userCode = Code.validate(sc.nextLine());
+        } catch (IllegalArgumentException e) {
+            System.out.println("Invalid code");
+            userCode = Code.NO_CODE;
+        }
         Order order = cart.checkout(client);
+        order.applyDiscount(discountService.getBestDiscountValue(order.getOrderedAt().toLocalTime(),order.getTotalOrder(), userCode));
         Invoice invoice = orderProcessor.process(order);
         System.out.println(invoice);
     }

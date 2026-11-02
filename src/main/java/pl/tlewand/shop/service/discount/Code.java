@@ -16,4 +16,8 @@ public enum Code {
         this.discountPercent = discountPercent;
     }
 
+    public static Code validate(String userCode) {
+        if (userCode.isBlank()) return Code.NO_CODE;
+        return valueOf(userCode.toUpperCase().trim());
+    }
 }

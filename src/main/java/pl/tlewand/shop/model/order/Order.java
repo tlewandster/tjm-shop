@@ -13,6 +13,7 @@ public class Order {
     private final List<OrderItem> orderItems;
     private final BigDecimal totalOrder;
     private final LocalDateTime orderedAt;
+    private BigDecimal discountAmount = BigDecimal.ZERO;
 
     public Order(Client client, List<OrderItem> orderItems) {
         Validate.notNull(client, "client can not be null");
@@ -28,5 +29,13 @@ public class Order {
         return orderItems.stream()
                 .map(OrderItem::calculateItemPrice)
                 .reduce(BigDecimal.ZERO,BigDecimal::add);
+    }
+
+    public void applyDiscount(BigDecimal amount) {
+        discountAmount = amount;
+    }
+
+    public BigDecimal getTotalDue() {
+        return totalOrder.subtract(discountAmount);
     }
 }

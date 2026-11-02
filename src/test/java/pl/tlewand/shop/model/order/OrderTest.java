@@ -1,6 +1,7 @@
 package pl.tlewand.shop.model.order;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.internal.matchers.Or;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -45,4 +46,24 @@ class OrderTest {
                 .containsExactly(new OrderItem(1, "prod1", new BigDecimal("10.50"), 4, null),
                         new OrderItem(2, "prod2", new BigDecimal("20.00"), 5, null));
     }
+
+    @Test
+    void shouldCalculateTotalDue() {
+        Order order = new Order(CLIENT, ORDER_ITEMS);
+        order.applyDiscount(new BigDecimal("42.00"));
+
+        assertThat(order.getTotalDue())
+                .isEqualTo("100.00");
+
+    }
+
+    @Test
+    void shouldCalculateTotalDueEqualsTotalOrder() {
+        Order order = new Order(CLIENT, ORDER_ITEMS);
+
+        assertThat(order.getTotalDue())
+                .isEqualTo(order.getTotalOrder());
+
+    }
+
 }
