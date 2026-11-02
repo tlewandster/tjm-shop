@@ -6,6 +6,7 @@ import lombok.Getter;
 public enum Code {
     NO_CODE(0),
     DISC10(10),
+    DISC15(15),
     DISC20(20),
     HALLOWEEN26(26);
 

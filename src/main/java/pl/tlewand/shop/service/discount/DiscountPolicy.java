@@ -13,7 +13,7 @@ public interface DiscountPolicy {
         Validate.notNull(orderTime, "orderTime can not be null");
         Validate.notNull(totalOrder, "totalOrder can not be null");
         Validate.notNull(discountCode, "discountCode can not be null");
-        Validate.isTrue(totalOrder.signum() > -1,"totalOrder value cannot be less than 0 ");
+        Validate.isTrue(totalOrder.signum() > -1,"totalOrder value cannot be less than 0");
     }
 
     default BigDecimal calculateDiscount(BigDecimal totalOrder, int discountPercent) {
