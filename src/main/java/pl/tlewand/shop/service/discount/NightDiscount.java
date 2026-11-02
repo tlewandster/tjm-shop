@@ -15,8 +15,8 @@ public class NightDiscount implements DiscountPolicy {
 
         validate(orderTime, totalOrder, discountCode);
         if (orderTime.isAfter(startTime) && orderTime.isBefore(endTime)) {
-            calculateDiscount(totalOrder, discountPercent);
+            return calculateDiscount(totalOrder, discountPercent);
         }
-        return BigDecimal.ZERO;
+        return BigDecimal.ZERO.setScale(2);
     }
 }
