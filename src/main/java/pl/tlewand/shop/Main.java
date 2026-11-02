@@ -118,7 +118,7 @@ public class Main {
             userCode = Code.NO_CODE;
         }
         Order order = cart.checkout(client);
-        order.applyDiscount(discountService.getBestDiscountValue(order.getOrderedAt().toLocalTime(),order.getTotalOrder(), userCode));
+        order.applyDiscount(discountService.getBestDiscountValue(order.getZonedOrderedAt().toLocalTime(),order.getTotalOrder(), userCode));
         Invoice invoice = orderProcessor.process(order);
         System.out.println(invoice);
     }

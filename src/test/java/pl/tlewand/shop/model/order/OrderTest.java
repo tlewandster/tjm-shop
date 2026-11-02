@@ -66,4 +66,14 @@ class OrderTest {
 
     }
 
+    @Test
+    void shouldReturnProperlyZone() {
+        Order order = new Order(CLIENT, ORDER_ITEMS);
+
+        assertThat(order.getZonedOrderedAt().getZone())
+                .isEqualTo(Order.SHOP_ZONE);
+        assertThat(order.getZonedOrderedAt().toInstant())
+                .isEqualTo(order.getOrderedAt());
+    }
+
 }

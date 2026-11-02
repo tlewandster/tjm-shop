@@ -17,7 +17,7 @@ public record Invoice(long invoiceNumber, Order order) {
                 .map(OrderItem::toString)
                 .collect(Collectors.joining("\n"));
 
-        String orderDate = order.getOrderedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
+        String orderDate = order.getZonedOrderedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
 
         return """
                 Invoice no. %d dated %s
