@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class OrderProcessor {
+    private static final int PROCESSING_TIME_IN_MILLIS = 200;
     private final ProductService productService;
     private final AtomicLong invoiceNumber = new AtomicLong(0);
 
@@ -50,7 +51,7 @@ public class OrderProcessor {
 
     public Invoice process(Order order) {
         validateAndReduceStock(order);
-        simulateLongOrderProcessing(200);
+        simulateLongOrderProcessing(PROCESSING_TIME_IN_MILLIS);
         return generateInvoice(order);
     }
 

@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Main {
-    private static final Scanner sc = new Scanner(System.in);
+    private static final Scanner SCANNER = new Scanner(System.in);
 
     static void main(String[] args) {
         ProductRepository productRepository = new InMemoryProductRepository();
@@ -80,8 +80,8 @@ public class Main {
 
             System.out.println("Your choice: ");
             try {
-                choice = sc.nextInt();
-                sc.nextLine();
+                choice = SCANNER.nextInt();
+                SCANNER.nextLine();
                 switch (choice) {
                     case 1 -> productList(productService);
                     case 2 -> addToCart(cart, productService);
@@ -103,7 +103,7 @@ public class Main {
     private static void removeFromCart(Cart cart) {
         viewCart(cart);
         System.out.println("Which item remove from cart?");
-        long itemId = sc.nextLong();
+        long itemId = SCANNER.nextLong();
         cart.removeItem(itemId);
         System.out.println("Removed");
     }
@@ -112,7 +112,7 @@ public class Main {
         Code userCode;
         System.out.println("Enter discount code: ");
         try {
-            userCode = Code.validate(sc.nextLine());
+            userCode = Code.validate(SCANNER.nextLine());
         } catch (IllegalArgumentException e) {
             System.out.println("Invalid code");
             userCode = Code.NO_CODE;
@@ -135,7 +135,7 @@ public class Main {
             System.out.println("Select the computer on which you want to change configuration:");
             computers.forEach(cartItem -> System.out.println(cartItem.toString()));
         }
-        long id = sc.nextLong();
+        long id = SCANNER.nextLong();
         CartItem selectedItem = computers.stream()
                 .filter(cartItem -> cartItem.getItemId() == id)
                 .findFirst()
@@ -157,7 +157,7 @@ public class Main {
     private static Cpu getNewCpu() {
         System.out.println("Select CPU:");
         Arrays.stream(Cpu.values()).forEach(cpu -> System.out.println(cpu.ordinal() + 1 + ". " + cpu.name()));
-        int cpuChoice = sc.nextInt();
+        int cpuChoice = SCANNER.nextInt();
         Cpu newCpu = switch (cpuChoice) {
             case 1 -> Cpu.INTEL_I5;
             case 2 -> Cpu.INTEL_I7;
@@ -172,7 +172,7 @@ public class Main {
     private static Gpu getNewGpu() {
         System.out.println("Select GPU:");
         Arrays.stream(Gpu.values()).forEach(gpu -> System.out.println(gpu.ordinal() + 1 + ". " + gpu.name()));
-        int gpuChoice = sc.nextInt();
+        int gpuChoice = SCANNER.nextInt();
         Gpu newGpu = switch (gpuChoice) {
             case 1 -> Gpu.NVIDIA_RTX_4060;
             case 2 -> Gpu.NVIDIA_RTX_4070;
@@ -187,7 +187,7 @@ public class Main {
     private static Ram getNewRam() {
         System.out.println("Select RAM:");
         Arrays.stream(Ram.values()).forEach(ram -> System.out.println(ram.ordinal() + 1 + ". " + ram.name()));
-        int ramChoice = sc.nextInt();
+        int ramChoice = SCANNER.nextInt();
         Ram newRam = switch (ramChoice) {
             case 1 -> Ram._16GB;
             case 2 -> Ram._32GB;
@@ -205,9 +205,9 @@ public class Main {
 
     private static void addToCart(Cart cart, ProductService productService) {
         System.out.println("Which product add to cart?");
-        long productId = sc.nextLong();
+        long productId = SCANNER.nextLong();
         System.out.println("How many?");
-        int qty = sc.nextInt();
+        int qty = SCANNER.nextInt();
         Product product = productService.find(productId);
         ComputerConfig config = product instanceof Computer computer ? new ComputerConfig(computer.getCpu(), computer.getGpu(), computer.getRam()) : null;
         cart.addItem(product, config, qty);

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class StockService {
+    private static final String SEPARATOR = ";";
     private final FileStorage fileStorage;
 
     public StockService(FileStorage fileStorage) {
@@ -19,14 +20,16 @@ public class StockService {
     public void load(Path path, ProductService productService) throws IOException {
         List<String> content = fileStorage.load(path);
         content.forEach(line -> {
-            String[] lineValue = line.split(";");
-            productService.updateStock(Long.parseLong(lineValue[0]), Integer.parseInt(lineValue[1]));
+            String[] lineValues = line.split(SEPARATOR);
+            String id = lineValues[0];
+            String stock = lineValues[1];
+            productService.updateStock(Long.parseLong(id), Integer.parseInt(stock));
         });
     }
 
     public void save(Path path, ProductService productService) throws IOException {
         String content = productService.findAll().stream()
-                .map(product -> product.getId() + ";" + product.getStock())
+                .map(product -> product.getId() + SEPARATOR + product.getStock())
                 .collect(Collectors.joining("\n"));
         fileStorage.save(path, content);
     }
