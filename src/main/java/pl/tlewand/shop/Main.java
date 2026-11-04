@@ -136,11 +136,13 @@ public class Main {
             computers.forEach(cartItem -> System.out.println(cartItem.toString()));
         }
         long id = SCANNER.nextLong();
-        CartItem selectedItem = computers.stream()
+        computers.stream()
                 .filter(cartItem -> cartItem.getItemId() == id)
                 .findFirst()
-                .get();
+                .ifPresentOrElse(cartItem -> applyNewConfigTo(cart, cartItem), () -> System.out.printf("No computer with id %d in your cart\n\n", id));
+    }
 
+    private static void applyNewConfigTo(Cart cart, CartItem selectedItem) {
         System.out.println("Select a new configuration. Current one is " + selectedItem.getItemConfig());
         ComputerConfig newConfig = selectNewConfig();
         cart.removeItem(selectedItem.getItemId());
