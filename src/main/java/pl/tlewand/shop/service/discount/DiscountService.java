@@ -13,7 +13,7 @@ public class DiscountService {
 
     public BigDecimal getBestDiscountValue(LocalTime orderTime, BigDecimal totalOrder, Code discountCode){
         return discountPolicies.stream()
-                .map(discountPolicy -> discountPolicy.allowedDiscount(orderTime,totalOrder,discountCode))
+                .map(discountPolicy -> discountPolicy.calculateDiscountValue(orderTime,totalOrder,discountCode))
                 .max(BigDecimal::compareTo)
                 .orElse(BigDecimal.ZERO);
     }

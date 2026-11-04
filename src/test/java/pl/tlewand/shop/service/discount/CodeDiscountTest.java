@@ -16,7 +16,7 @@ class CodeDiscountTest {
 
     @Test
     void shouldCalculateCodeDiscount() {
-        BigDecimal calculated = discount.allowedDiscount(orderTime,totalOrder,discountCode);
+        BigDecimal calculated = discount.calculateDiscountValue(orderTime,totalOrder,discountCode);
 
         assertThat(calculated)
                 .isEqualTo(new BigDecimal("18.52"));
@@ -24,7 +24,7 @@ class CodeDiscountTest {
 
     @Test
     void shouldCalculateCodeDiscountEqualsZero() {
-        BigDecimal calculated = discount.allowedDiscount(orderTime,totalOrder,Code.NO_CODE);
+        BigDecimal calculated = discount.calculateDiscountValue(orderTime,totalOrder,Code.NO_CODE);
 
         assertThat(calculated)
                 .isEqualTo(new BigDecimal("0.00"));
@@ -32,21 +32,21 @@ class CodeDiscountTest {
 
     @Test
     void shouldThrowNullPointerExceptionWhileOrderTimeIsNull() {
-        assertThatThrownBy(() -> discount.allowedDiscount(null, totalOrder, discountCode))
+        assertThatThrownBy(() -> discount.calculateDiscountValue(null, totalOrder, discountCode))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("orderTime can not be null");
     }
 
     @Test
     void shouldThrowNullPointerExceptionWhileTotalOrderIsNull() {
-        assertThatThrownBy(() -> discount.allowedDiscount(orderTime, null, discountCode))
+        assertThatThrownBy(() -> discount.calculateDiscountValue(orderTime, null, discountCode))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("totalOrder can not be null");
     }
 
     @Test
     void shouldThrowIllegalArgumentExceptionWhileTotalOrderLessThanZero() {
-        assertThatThrownBy(() -> discount.allowedDiscount(orderTime, new BigDecimal("-100.00"), discountCode))
+        assertThatThrownBy(() -> discount.calculateDiscountValue(orderTime, new BigDecimal("-100.00"), discountCode))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("totalOrder value cannot be less than 0");
     }

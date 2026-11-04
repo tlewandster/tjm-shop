@@ -16,37 +16,37 @@ class NightDiscountTest {
 
     @Test
     void shouldCalculateNightDiscount() {
-        BigDecimal calculated = discount.allowedDiscount(orderTime, totalOrder, discountCode);
+        BigDecimal calculated = discount.calculateDiscountValue(orderTime, totalOrder, discountCode);
 
         assertThat(calculated).isEqualTo(new BigDecimal("18.52"));
     }
 
     @Test
     void shouldAtMidnightCalculateNightDiscountEqualsZero() {
-        BigDecimal calculated = discount.allowedDiscount(LocalTime.of(0, 0), totalOrder, Code.NO_CODE);
+        BigDecimal calculated = discount.calculateDiscountValue(LocalTime.of(0, 0), totalOrder, Code.NO_CODE);
 
         assertThat(calculated).isEqualTo(new BigDecimal("0.00"));
     }
 
     @Test
     void shouldCalculateNightDiscountEqualsZero() {
-        BigDecimal calculated = discount.allowedDiscount(LocalTime.of(18, 0), totalOrder, Code.NO_CODE);
+        BigDecimal calculated = discount.calculateDiscountValue(LocalTime.of(18, 0), totalOrder, Code.NO_CODE);
 
         assertThat(calculated).isEqualTo(new BigDecimal("0.00"));
     }
 
     @Test
     void shouldThrowNullPointerExceptionWhileOrderTimeIsNull() {
-        assertThatThrownBy(() -> discount.allowedDiscount(null, totalOrder, discountCode)).isInstanceOf(NullPointerException.class).hasMessage("orderTime can not be null");
+        assertThatThrownBy(() -> discount.calculateDiscountValue(null, totalOrder, discountCode)).isInstanceOf(NullPointerException.class).hasMessage("orderTime can not be null");
     }
 
     @Test
     void shouldThrowNullPointerExceptionWhileTotalOrderIsNull() {
-        assertThatThrownBy(() -> discount.allowedDiscount(orderTime, null, discountCode)).isInstanceOf(NullPointerException.class).hasMessage("totalOrder can not be null");
+        assertThatThrownBy(() -> discount.calculateDiscountValue(orderTime, null, discountCode)).isInstanceOf(NullPointerException.class).hasMessage("totalOrder can not be null");
     }
 
     @Test
     void shouldThrowIllegalArgumentExceptionWhileTotalOrderLessThanZero() {
-        assertThatThrownBy(() -> discount.allowedDiscount(orderTime, new BigDecimal("-100.00"), discountCode)).isInstanceOf(IllegalArgumentException.class).hasMessage("totalOrder value cannot be less than 0");
+        assertThatThrownBy(() -> discount.calculateDiscountValue(orderTime, new BigDecimal("-100.00"), discountCode)).isInstanceOf(IllegalArgumentException.class).hasMessage("totalOrder value cannot be less than 0");
     }
 }

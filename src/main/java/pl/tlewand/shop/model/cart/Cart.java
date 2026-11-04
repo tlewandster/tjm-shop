@@ -63,7 +63,7 @@ public class Cart {
         return List.copyOf(items.values());
     }
 
-    public BigDecimal totalPrice() {
+    public BigDecimal calculateTotalPrice() {
         return items.values().stream()
                 .map(cartItem ->
                         cartItem.calculateUnitItemPrice()

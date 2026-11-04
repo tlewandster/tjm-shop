@@ -200,7 +200,7 @@ public class Main {
     private static void viewCart(Cart cart) {
         cart.getItems()
                 .forEach(cartItem -> System.out.println(cartItem.toString()));
-        System.out.println("Total cart value: " + cart.totalPrice());
+        System.out.println("Total cart value: " + cart.calculateTotalPrice());
     }
 
     private static void addToCart(Cart cart, ProductManager productManager) {

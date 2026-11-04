@@ -128,7 +128,7 @@ public class CartTest {
 
     @Test
     void shouldReturnZeroTotalForEmptyCart() {
-        assertThat(cart.totalPrice())
+        assertThat(cart.calculateTotalPrice())
                 .isEqualByComparingTo(BigDecimal.ZERO);
     }
 
@@ -141,7 +141,7 @@ public class CartTest {
         BigDecimal expectedTotalPriceFirstItem = firstItem.getProduct().getPrice().multiply(BigDecimal.valueOf(firstItem.getQty()));
         BigDecimal expectedTotalPriceSecondItem = secondItem.getProduct().getPrice().multiply(BigDecimal.valueOf(secondItem.getQty()));
 
-        BigDecimal totalPrice = cart.totalPrice();
+        BigDecimal totalPrice = cart.calculateTotalPrice();
 
         assertThat(totalPrice)
                 .isEqualByComparingTo(expectedTotalPriceFirstItem.add(expectedTotalPriceSecondItem));

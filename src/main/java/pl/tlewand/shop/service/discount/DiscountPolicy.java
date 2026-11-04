@@ -7,7 +7,7 @@ import java.math.RoundingMode;
 import java.time.LocalTime;
 
 public interface DiscountPolicy {
-    BigDecimal allowedDiscount(LocalTime orderTime, BigDecimal totalOrder, Code discountCode);
+    BigDecimal calculateDiscountValue(LocalTime orderTime, BigDecimal totalOrder, Code discountCode);
 
     default void validate(LocalTime orderTime, BigDecimal totalOrder, Code discountCode) {
         Validate.notNull(orderTime, "orderTime can not be null");
@@ -16,7 +16,7 @@ public interface DiscountPolicy {
         Validate.isTrue(totalOrder.signum() > -1,"totalOrder value cannot be less than 0");
     }
 
-    default BigDecimal calculateDiscount(BigDecimal totalOrder, int discountPercent) {
+    default BigDecimal calculatePercentageOf(BigDecimal totalOrder, int discountPercent) {
         return totalOrder
                 .multiply(BigDecimal.valueOf(discountPercent))
                 .divide(new BigDecimal("100"))

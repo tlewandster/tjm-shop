@@ -31,8 +31,8 @@ class DiscountServiceTest {
     @Test
     void shouldGetBestDiscountValue() {
         discountService = new DiscountService(List.of(codeDiscount,nightDiscount));
-        when(codeDiscount.allowedDiscount(any(),any(),any())).thenReturn(new BigDecimal("50.00"));
-        when(nightDiscount.allowedDiscount(any(),any(),any())).thenReturn(new BigDecimal("100.00"));
+        when(codeDiscount.calculateDiscountValue(any(),any(),any())).thenReturn(new BigDecimal("50.00"));
+        when(nightDiscount.calculateDiscountValue(any(),any(),any())).thenReturn(new BigDecimal("100.00"));
 
         BigDecimal result = discountService.getBestDiscountValue(orderTime, totalOrder, discountCode);
 
