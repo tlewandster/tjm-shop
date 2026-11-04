@@ -23,7 +23,7 @@ class StockServiceTest {
     @InjectMocks
     private StockService stockService;
     @Mock
-    private ProductManager productManager;
+    private ProductService productService;
     @Mock
     private FileStorage fileStorage;
 
@@ -34,10 +34,10 @@ class StockServiceTest {
 
         when(fileStorage.load(path)).thenReturn(List.of(firstStock,secondStock));
 
-        stockService.load(path, productManager);
+        stockService.load(path, productService);
 
-        verify(productManager).updateStock(1L,10);
-        verify(productManager).updateStock(2L,20);
+        verify(productService).updateStock(1L,10);
+        verify(productService).updateStock(2L,20);
     }
 
     @Test
@@ -45,9 +45,9 @@ class StockServiceTest {
         Product product1 = new Electronics(1, "Product1", new BigDecimal("10.00"), 10);
         Product product2 = new Electronics(2, "Product2", new BigDecimal("20.00"), 20);
         String expectedFileContent = "1;10\n2;20";
-        when(productManager.findAll()).thenReturn(List.of(product1,product2));
+        when(productService.findAll()).thenReturn(List.of(product1,product2));
 
-        stockService.save(path,productManager);
+        stockService.save(path, productService);
 
         verify(fileStorage).save(path,expectedFileContent);
     }

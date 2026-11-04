@@ -32,30 +32,30 @@ class OrderProcessorTest {
     );
     private static final Order ORDER = new Order(CLIENT, ORDER_ITEMS);
     @Mock
-    private ProductManager productManager;
+    private ProductService productService;
     @InjectMocks
     private OrderProcessor orderProcessor;
 
     @Test
     void shouldProcessOrder() {
         Electronics product = new Electronics(1, "Product", new BigDecimal("20.00"), 50);
-        when(productManager.find(1)).thenReturn(product);
+        when(productService.find(1)).thenReturn(product);
 
         Invoice invoice = orderProcessor.process(ORDER);
 
         assertThat(invoice.invoiceNumber()).isEqualTo(1);
-        verify(productManager).updateStock(1, 46);
+        verify(productService).updateStock(1, 46);
     }
 
     @Test
     void shouldThrowWhenOutOfStock() {
         Electronics product = new Electronics(1, "Product", new BigDecimal("20.00"), 1);
-        when(productManager.find(1)).thenReturn(product);
+        when(productService.find(1)).thenReturn(product);
 
         assertThatThrownBy(() -> orderProcessor.process(ORDER))
                 .isInstanceOf(OutOfStockException.class)
                 .hasMessageContaining(product.getName());
-        verify(productManager, never()).updateStock(anyLong(), anyInt());
+        verify(productService, never()).updateStock(anyLong(), anyInt());
     }
 
     @Test
@@ -66,13 +66,13 @@ class OrderProcessorTest {
                 new OrderItem(1, "prod1", new BigDecimal("10.50"), 4, null)
         );
         Order order = new Order(CLIENT, items);
-        when(productManager.find(1)).thenReturn(product);
+        when(productService.find(1)).thenReturn(product);
 
         assertThatThrownBy(() -> orderProcessor.process(order))
                 .isInstanceOf(OutOfStockException.class)
                 .hasMessageContaining(product.getName());
 
-        verify(productManager, never()).updateStock(anyLong(), anyInt());
+        verify(productService, never()).updateStock(anyLong(), anyInt());
     }
 
     @Test
@@ -83,7 +83,7 @@ class OrderProcessorTest {
         OrderItem orderItem = new OrderItem(1, "prod1", new BigDecimal("10.50"), 4, null);
         IntStream.rangeClosed(1, 100)
                 .forEach(i -> orders.add(new Order(client, List.of(orderItem))));
-        when(productManager.find(anyLong())).thenReturn(product);
+        when(productService.find(anyLong())).thenReturn(product);
 
         long syncBefore = System.nanoTime();
         List<Invoice> syncInvoices = orderProcessor.processOrdersSync(orders);

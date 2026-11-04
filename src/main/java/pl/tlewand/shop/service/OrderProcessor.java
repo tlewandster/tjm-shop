@@ -16,12 +16,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class OrderProcessor {
-    private final ProductManager productManager;
+    private final ProductService productService;
     private final AtomicLong invoiceNumber = new AtomicLong(0);
 
-    public OrderProcessor(ProductManager productManager) {
-        Validate.notNull(productManager, "productManager can not be null");
-        this.productManager = productManager;
+    public OrderProcessor(ProductService productService) {
+        Validate.notNull(productService, "productManager can not be null");
+        this.productService = productService;
     }
 
     public List<Invoice> processOrdersSync(List<Order> orders) {
@@ -69,7 +69,7 @@ public class OrderProcessor {
 
     private void validateStock(Order order) {
         getStreamIdQtyFrom(order).forEach(entry -> {
-            Product product = productManager.find(entry.getKey());
+            Product product = productService.find(entry.getKey());
             int stock = product.getStock();
             Integer requestedQty = entry.getValue();
             if (requestedQty > stock) {
@@ -82,8 +82,8 @@ public class OrderProcessor {
         getStreamIdQtyFrom(order).forEach(entry -> {
             Long productId = entry.getKey();
             Integer qty = entry.getValue();
-            int newStock = productManager.find(productId).getStock() - qty;
-            productManager.updateStock(productId, newStock);
+            int newStock = productService.find(productId).getStock() - qty;
+            productService.updateStock(productId, newStock);
         });
     }
 

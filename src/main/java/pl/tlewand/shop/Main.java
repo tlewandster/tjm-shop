@@ -10,7 +10,7 @@ import pl.tlewand.shop.model.product.*;
 import pl.tlewand.shop.repository.InMemoryProductRepository;
 import pl.tlewand.shop.repository.ProductRepository;
 import pl.tlewand.shop.service.OrderProcessor;
-import pl.tlewand.shop.service.ProductManager;
+import pl.tlewand.shop.service.ProductService;
 import pl.tlewand.shop.service.StockService;
 import pl.tlewand.shop.service.discount.Code;
 import pl.tlewand.shop.service.discount.CodeDiscount;
@@ -30,42 +30,42 @@ public class Main {
 
     static void main(String[] args) {
         ProductRepository productRepository = new InMemoryProductRepository();
-        ProductManager productManager = new ProductManager(productRepository);
-        OrderProcessor orderProcessor = new OrderProcessor(productManager);
+        ProductService productService = new ProductService(productRepository);
+        OrderProcessor orderProcessor = new OrderProcessor(productService);
         StockService stockService = new StockService(new FileStorage());
         Path dataDir = Path.of("data");
         Path stockStorageFile = dataDir.resolve("stock.txt");
 
-        productManager.add(new Computer(1, "Lenovo Legion 5", new BigDecimal("5999.00"), 5, Cpu.AMD_RYZEN_7, Gpu.NVIDIA_RTX_4060, Ram._16GB));
-        productManager.add(new Computer(2, "ASUS ROG Strix G16", new BigDecimal("8499.00"), 3, Cpu.INTEL_I7, Gpu.NVIDIA_RTX_4070, Ram._32GB));
-        productManager.add(new Computer(3, "MSI Titan Pro", new BigDecimal("12999.00"), 2, Cpu.AMD_RYZEN_9, Gpu.NVIDIA_RTX_4080, Ram._64GB));
+        productService.add(new Computer(1, "Lenovo Legion 5", new BigDecimal("5999.00"), 5, Cpu.AMD_RYZEN_7, Gpu.NVIDIA_RTX_4060, Ram._16GB));
+        productService.add(new Computer(2, "ASUS ROG Strix G16", new BigDecimal("8499.00"), 3, Cpu.INTEL_I7, Gpu.NVIDIA_RTX_4070, Ram._32GB));
+        productService.add(new Computer(3, "MSI Titan Pro", new BigDecimal("12999.00"), 2, Cpu.AMD_RYZEN_9, Gpu.NVIDIA_RTX_4080, Ram._64GB));
 
-        productManager.add(new Smartphone(4, "Samsung Galaxy S25", new BigDecimal("3999.00"), 10, Colour.BLACK, 4000));
-        productManager.add(new Smartphone(5, "iPhone 17", new BigDecimal("4499.00"), 8, Colour.WHITE, 3600));
-        productManager.add(new Smartphone(6, "Xiaomi 15", new BigDecimal("2799.00"), 12, Colour.BLUE, 5400));
+        productService.add(new Smartphone(4, "Samsung Galaxy S25", new BigDecimal("3999.00"), 10, Colour.BLACK, 4000));
+        productService.add(new Smartphone(5, "iPhone 17", new BigDecimal("4499.00"), 8, Colour.WHITE, 3600));
+        productService.add(new Smartphone(6, "Xiaomi 15", new BigDecimal("2799.00"), 12, Colour.BLUE, 5400));
 
-        productManager.add(new Electronics(7, "Etui", new BigDecimal("59.99"), 50));
-        productManager.add(new Electronics(8, "Ładowarka", new BigDecimal("149.00"), 30));
-        productManager.add(new Electronics(9, "Mysz bezprzewodowa", new BigDecimal("179.00"), 20));
+        productService.add(new Electronics(7, "Etui", new BigDecimal("59.99"), 50));
+        productService.add(new Electronics(8, "Ładowarka", new BigDecimal("149.00"), 30));
+        productService.add(new Electronics(9, "Mysz bezprzewodowa", new BigDecimal("179.00"), 20));
 
         Client client = (new Client(1, "Jan Kunefał", "ul. Krótka 5, 00-001 Warszawa"));
         Cart cart = new Cart();
         DiscountService discountService = new DiscountService(List.of(new CodeDiscount(), new NightDiscount()));
         try {
-            stockService.load(stockStorageFile, productManager);
+            stockService.load(stockStorageFile, productService);
         } catch (IOException e) {
             System.out.println("Problem reading file " + stockStorageFile + ". " + e.getMessage());
         }
 
-        run(productManager, orderProcessor, cart, client, discountService);
+        run(productService, orderProcessor, cart, client, discountService);
         try {
-            stockService.save(stockStorageFile, productManager);
+            stockService.save(stockStorageFile, productService);
         } catch (IOException e) {
             System.out.println("Problem writing to file " + stockStorageFile + ". " + e.getMessage());
         }
     }
 
-    private static void run(ProductManager productManager, OrderProcessor orderProcessor, Cart cart, Client client, DiscountService discountService) {
+    private static void run(ProductService productService, OrderProcessor orderProcessor, Cart cart, Client client, DiscountService discountService) {
         int choice = 0;
         do {
             System.out.println("""
@@ -83,8 +83,8 @@ public class Main {
                 choice = sc.nextInt();
                 sc.nextLine();
                 switch (choice) {
-                    case 1 -> productList(productManager);
-                    case 2 -> addToCart(cart, productManager);
+                    case 1 -> productList(productService);
+                    case 2 -> addToCart(cart, productService);
                     case 3 -> removeFromCart(cart);
                     case 4 -> viewCart(cart);
                     case 5 -> changeConfig(cart);
@@ -203,19 +203,19 @@ public class Main {
         System.out.println("Total cart value: " + cart.calculateTotalPrice());
     }
 
-    private static void addToCart(Cart cart, ProductManager productManager) {
+    private static void addToCart(Cart cart, ProductService productService) {
         System.out.println("Which product add to cart?");
         long productId = sc.nextLong();
         System.out.println("How many?");
         int qty = sc.nextInt();
-        Product product = productManager.find(productId);
+        Product product = productService.find(productId);
         ComputerConfig config = product instanceof Computer computer ? new ComputerConfig(computer.getCpu(), computer.getGpu(), computer.getRam()) : null;
         cart.addItem(product, config, qty);
         System.out.printf("Added to cart %d pcs.:\n%s\n", qty, product.toString());
     }
 
-    private static void productList(ProductManager productManager) {
-        productManager.findAll()
+    private static void productList(ProductService productService) {
+        productService.findAll()
                 .forEach(product -> System.out.println(product.toString()));
         System.out.println();
     }

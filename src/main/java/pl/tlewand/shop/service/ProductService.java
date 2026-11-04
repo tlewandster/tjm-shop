@@ -8,10 +8,10 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-public class ProductManager {
+public class ProductService {
     private final ProductRepository productRepository;
 
-    public ProductManager(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository) {
         Validate.notNull(productRepository, "Product repository cannot be null");
         this.productRepository = productRepository;
     }

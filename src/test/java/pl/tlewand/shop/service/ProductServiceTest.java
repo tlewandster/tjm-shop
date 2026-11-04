@@ -20,18 +20,18 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class ProductManagerTest {
+class ProductServiceTest {
 
     @Mock
     private ProductRepository productRepository;
 
     @InjectMocks
-    private ProductManager productManager;
+    private ProductService productService;
 
     @Test
     void shouldThrowNullPointerExceptionWhenRepoIsNull() {
 
-        assertThatThrownBy(() -> new ProductManager(null))
+        assertThatThrownBy(() -> new ProductService(null))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("Product repository cannot be null");
     }
@@ -42,14 +42,14 @@ class ProductManagerTest {
         Electronics product = new Electronics(id, "Product", new BigDecimal("20.00"), 50);
         when(productRepository.find(id)).thenReturn(Optional.empty());
 
-        productManager.add(product);
+        productService.add(product);
 
         verify(productRepository).save(product);
     }
 
     @Test
     void shouldThrowNullPointerExceptionWhenProductIsNull() {
-        assertThatThrownBy(() -> productManager.add(null))
+        assertThatThrownBy(() -> productService.add(null))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("Product cannot be null");
 
@@ -62,7 +62,7 @@ class ProductManagerTest {
         Product product = new Electronics(id, "Product", new BigDecimal("10.00"), 123);
         when(productRepository.find(id)).thenReturn(Optional.of(product));
 
-        assertThatThrownBy(() -> productManager.add(product))
+        assertThatThrownBy(() -> productService.add(product))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("Product with ID %d already exists", id);
         verify(productRepository, never()).save(any());
@@ -74,7 +74,7 @@ class ProductManagerTest {
         Product foundProduct = new Electronics(id, "Product", new BigDecimal("10.00"), 123);
         when(productRepository.find(id)).thenReturn(Optional.of(foundProduct));
 
-        Product returnedProduct = productManager.find(id);
+        Product returnedProduct = productService.find(id);
 
         assertThat(returnedProduct)
                 .isSameAs(foundProduct);
@@ -85,7 +85,7 @@ class ProductManagerTest {
         long id = 123;
         when(productRepository.find(id)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> productManager.find(id))
+        assertThatThrownBy(() -> productService.find(id))
                 .isInstanceOf(NoSuchElementException.class)
                 .hasMessage("No product with ID %d was found", id);
     }
@@ -96,7 +96,7 @@ class ProductManagerTest {
         Product product2 = new Electronics(2, "Product2", new BigDecimal("20.00"), 200);
         when(productRepository.findAll()).thenReturn(new ArrayList<>(List.of(product1, product2)));
 
-        List<Product> all = productManager.findAll();
+        List<Product> all = productService.findAll();
 
         assertThat(all).containsExactly(product1, product2);
     }
@@ -107,7 +107,7 @@ class ProductManagerTest {
         Product product2 = new Electronics(2, "Product2", new BigDecimal("20.00"), 200);
         when(productRepository.findAll()).thenReturn(new ArrayList<>(List.of(product1)));
 
-        List<Product> all = productManager.findAll();
+        List<Product> all = productService.findAll();
 
         assertThatThrownBy(() -> all.add(product2))
                 .isInstanceOf(UnsupportedOperationException.class);
@@ -119,7 +119,7 @@ class ProductManagerTest {
         Product product = new Electronics(id, "Product1", new BigDecimal("10.00"), 100);
         when(productRepository.find(id)).thenReturn(Optional.of(product));
 
-        productManager.delete(id);
+        productService.delete(id);
 
         verify(productRepository).delete(id);
     }
@@ -129,7 +129,7 @@ class ProductManagerTest {
         long id = 666;
         when(productRepository.find(id)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> productManager.delete(id))
+        assertThatThrownBy(() -> productService.delete(id))
                 .isInstanceOf(NoSuchElementException.class)
                 .hasMessage("No product with ID %d was found", id);
         verify(productRepository, never()).delete(anyLong());
@@ -142,7 +142,7 @@ class ProductManagerTest {
         Product product1 = new Electronics(id, "Product1", new BigDecimal("10.00"), 100);
         when(productRepository.find(id)).thenReturn(Optional.of(product1));
 
-        productManager.updateName(id, newName);
+        productService.updateName(id, newName);
 
         verify(productRepository).update(product1);
         assertThat(product1.getName())
@@ -155,7 +155,7 @@ class ProductManagerTest {
         String newName = "newName";
         when(productRepository.find(id)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> productManager.updateName(id, newName))
+        assertThatThrownBy(() -> productService.updateName(id, newName))
                 .isInstanceOf(NoSuchElementException.class)
                 .hasMessage("No product with ID %d was found", id);
         verify(productRepository, never()).update(any());
@@ -168,7 +168,7 @@ class ProductManagerTest {
         Product product1 = new Electronics(id, "Product1", new BigDecimal("10.00"), 100);
         when(productRepository.find(id)).thenReturn(Optional.of(product1));
 
-        productManager.updatePrice(id, newPrice);
+        productService.updatePrice(id, newPrice);
 
         verify(productRepository).update(product1);
         assertThat(product1.getPrice())
@@ -182,7 +182,7 @@ class ProductManagerTest {
         BigDecimal newPrice = new BigDecimal("250.00");
         when(productRepository.find(id)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> productManager.updatePrice(id, newPrice))
+        assertThatThrownBy(() -> productService.updatePrice(id, newPrice))
                 .isInstanceOf(NoSuchElementException.class)
                 .hasMessage("No product with ID %d was found", id);
         verify(productRepository, never()).update(any());
@@ -195,7 +195,7 @@ class ProductManagerTest {
         Product product1 = new Electronics(id, "Product", new BigDecimal("10.00"), 100);
         when(productRepository.find(id)).thenReturn(Optional.of(product1));
 
-        productManager.updateStock(id, newStock);
+        productService.updateStock(id, newStock);
 
         verify(productRepository).update(product1);
         assertThat(product1.getStock())
@@ -208,7 +208,7 @@ class ProductManagerTest {
         int newStock = 123;
         when(productRepository.find(id)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> productManager.updateStock(id, newStock))
+        assertThatThrownBy(() -> productService.updateStock(id, newStock))
                 .isInstanceOf(NoSuchElementException.class)
                 .hasMessage("No product with ID %d was found", id);
         verify(productRepository, never()).update(any());

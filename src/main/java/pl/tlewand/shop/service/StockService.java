@@ -16,16 +16,16 @@ public class StockService {
         this.fileStorage = fileStorage;
     }
 
-    public void load(Path path, ProductManager productManager) throws IOException {
+    public void load(Path path, ProductService productService) throws IOException {
         List<String> content = fileStorage.load(path);
         content.forEach(line -> {
             String[] lineValue = line.split(";");
-            productManager.updateStock(Long.parseLong(lineValue[0]), Integer.parseInt(lineValue[1]));
+            productService.updateStock(Long.parseLong(lineValue[0]), Integer.parseInt(lineValue[1]));
         });
     }
 
-    public void save(Path path, ProductManager productManager) throws IOException {
-        String content = productManager.findAll().stream()
+    public void save(Path path, ProductService productService) throws IOException {
+        String content = productService.findAll().stream()
                 .map(product -> product.getId() + ";" + product.getStock())
                 .collect(Collectors.joining("\n"));
         fileStorage.save(path, content);
