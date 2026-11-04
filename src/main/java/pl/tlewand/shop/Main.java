@@ -118,7 +118,7 @@ public class Main {
             userCode = Code.NO_CODE;
         }
         Order order = cart.checkout(client);
-        order.applyDiscount(discountService.getBestDiscountValue(order.getZonedOrderedAt().toLocalTime(),order.getTotalOrder(), userCode));
+        order.applyDiscount(discountService.getBestDiscountValue(order.getZonedOrderedAt().toLocalTime(), order.getTotalOrder(), userCode));
         Invoice invoice = orderProcessor.process(order);
         System.out.println(invoice);
     }
@@ -131,10 +131,9 @@ public class Main {
         if (computers.isEmpty()) {
             System.out.println("You don't have any computers in your cart");
             return;
-        } else {
-            System.out.println("Select the computer on which you want to change configuration:");
-            computers.forEach(cartItem -> System.out.println(cartItem.toString()));
         }
+        System.out.println("Select the computer on which you want to change configuration:");
+        computers.forEach(System.out::println);
         long id = SCANNER.nextLong();
         computers.stream()
                 .filter(cartItem -> cartItem.getItemId() == id)
@@ -201,7 +200,7 @@ public class Main {
 
     private static void viewCart(Cart cart) {
         cart.getItems()
-                .forEach(cartItem -> System.out.println(cartItem.toString()));
+                .forEach(System.out::println);
         System.out.println("Total cart value: " + cart.calculateTotalPrice());
     }
 
@@ -218,7 +217,7 @@ public class Main {
 
     private static void productList(ProductService productService) {
         productService.findAll()
-                .forEach(product -> System.out.println(product.toString()));
+                .forEach(System.out::println);
         System.out.println();
     }
 }
