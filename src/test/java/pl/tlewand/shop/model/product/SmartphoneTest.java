@@ -14,7 +14,7 @@ class SmartphoneTest {
     @CsvSource("1,Smartphone,1000,100,BLACK,1")
     void shouldCreateSmartphoneSuccessfully(long id, String name, BigDecimal price, int stock, Colour colour, int batteryCapacityMah) {
         //when
-        Smartphone smartphone = new Smartphone(id, name, price, stock, colour, batteryCapacityMah);
+        Smartphone smartphone = new Smartphone(id, name, price, stock, new SmartphoneSpec(colour, batteryCapacityMah));
 
         //then
         assertThat(smartphone.getColour()).isEqualTo(colour);
@@ -25,7 +25,7 @@ class SmartphoneTest {
     @CsvSource("1,Smartphone,1000,100,,1000")
     void shouldThrowNullPointerException(long id, String name, BigDecimal price, int stock, Colour colour, int batteryCapacityMah) {
         //then
-        assertThatThrownBy(()->new Smartphone(id, name, price, stock, colour, batteryCapacityMah))
+        assertThatThrownBy(()->new Smartphone(id, name, price, stock, new SmartphoneSpec(colour, batteryCapacityMah)))
                 .isInstanceOf(NullPointerException.class);
     }
 
@@ -36,7 +36,7 @@ class SmartphoneTest {
     })
     void shouldThrowIllegalArgumentException(long id, String name, BigDecimal price, int stock, Colour colour, int batteryCapacityMah) {
         //then
-        assertThatThrownBy(()->new Smartphone(id, name, price, stock, colour, batteryCapacityMah))
+        assertThatThrownBy(()->new Smartphone(id, name, price, stock, new SmartphoneSpec(colour, batteryCapacityMah)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

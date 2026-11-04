@@ -40,9 +40,9 @@ public class Main {
         productService.add(new Computer(2, "ASUS ROG Strix G16", new BigDecimal("8499.00"), 3, new ComputerConfig(Cpu.INTEL_I7, Gpu.NVIDIA_RTX_4070, Ram._32GB)));
         productService.add(new Computer(3, "MSI Titan Pro", new BigDecimal("12999.00"), 2, new ComputerConfig(Cpu.AMD_RYZEN_9, Gpu.NVIDIA_RTX_4080, Ram._64GB)));
 
-        productService.add(new Smartphone(4, "Samsung Galaxy S25", new BigDecimal("3999.00"), 10, Colour.BLACK, 4000));
-        productService.add(new Smartphone(5, "iPhone 17", new BigDecimal("4499.00"), 8, Colour.WHITE, 3600));
-        productService.add(new Smartphone(6, "Xiaomi 15", new BigDecimal("2799.00"), 12, Colour.BLUE, 5400));
+        productService.add(new Smartphone(4, "Samsung Galaxy S25", new BigDecimal("3999.00"), 10, new SmartphoneSpec(Colour.BLACK, 4000)));
+        productService.add(new Smartphone(5, "iPhone 17", new BigDecimal("4499.00"), 8, new SmartphoneSpec(Colour.WHITE, 3600)));
+        productService.add(new Smartphone(6, "Xiaomi 15", new BigDecimal("2799.00"), 12, new SmartphoneSpec(Colour.BLUE, 5400)));
 
         productService.add(new Electronics(7, "Etui", new BigDecimal("59.99"), 50));
         productService.add(new Electronics(8, "Ładowarka", new BigDecimal("149.00"), 30));
