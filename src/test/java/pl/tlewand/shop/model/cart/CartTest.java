@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class CartTest {
     private static final Electronics ELECTRONICS = new Electronics(1, "Electronics", new BigDecimal("10.00"), 100);
-    private static final Computer COMPUTER = new Computer(2, "Computer", new BigDecimal("2000.00"), 200, Cpu.AMD_RYZEN_7, Gpu.NVIDIA_RTX_4060, Ram._16GB);
+    private static final Computer COMPUTER = new Computer(2, "Computer", new BigDecimal("2000.00"), 200, new ComputerConfig(Cpu.AMD_RYZEN_7, Gpu.NVIDIA_RTX_4060, Ram._16GB));
     private static final ComputerConfig COMPUTER_CONFIG = new ComputerConfig(Cpu.AMD_RYZEN_7, Gpu.NVIDIA_RTX_4060, Ram._16GB);
     private static final Client CLIENT = new Client(1, "Jan Kowalski", "ul.Błotna 69, Podmokle");
     private static final int QTY = 1;

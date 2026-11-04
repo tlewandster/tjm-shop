@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 public class CartItemTest {
     private static final long ITEM_ID = 1;
     private static final Electronics ELECTRONICS = new Electronics(1, "Electronics", new BigDecimal("10.00"), 100);
-    private static final Computer COMPUTER = new Computer(2, "Computer", new BigDecimal("2000.00"), 200, Cpu.AMD_RYZEN_7, Gpu.NVIDIA_RTX_4060, Ram._16GB);
+    private static final Computer COMPUTER = new Computer(2, "Computer", new BigDecimal("2000.00"), 200, new ComputerConfig(Cpu.AMD_RYZEN_7, Gpu.NVIDIA_RTX_4060, Ram._16GB));
     private static final ComputerConfig COMPUTER_CONFIG = new ComputerConfig(Cpu.AMD_RYZEN_7, Gpu.NVIDIA_RTX_4060, Ram._16GB);
     private static final int QTY = 1;
 
@@ -81,7 +81,7 @@ public class CartItemTest {
 
     void shouldIncreasePriceForMoreExpensiveComponent() {
         ComputerConfig customConfig = new ComputerConfig(COMPUTER_CONFIG.cpu(), COMPUTER_CONFIG.gpu(), Ram._32GB);
-        BigDecimal priceDifference = customConfig.ram().getPrice().subtract(COMPUTER.getRam().getPrice());
+        BigDecimal priceDifference = customConfig.ram().getPrice().subtract(COMPUTER.getConfig().ram().getPrice());
         int qty = 2;
         CartItem cartItem = new CartItem(ITEM_ID, COMPUTER, customConfig, qty);
 
@@ -94,7 +94,7 @@ public class CartItemTest {
     @Test
     void shouldDecreasePriceForCheaperComponent() {
         ComputerConfig customConfig = new ComputerConfig(Cpu.AMD_RYZEN_5, COMPUTER_CONFIG.gpu(), COMPUTER_CONFIG.ram());
-        BigDecimal priceDifference = customConfig.cpu().getPrice().subtract(COMPUTER.getCpu().getPrice());
+        BigDecimal priceDifference = customConfig.cpu().getPrice().subtract(COMPUTER.getConfig().cpu().getPrice());
         int qty = 2;
         CartItem cartItem = new CartItem(ITEM_ID, COMPUTER, customConfig, qty);
 

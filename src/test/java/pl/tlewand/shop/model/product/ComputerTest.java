@@ -13,21 +13,19 @@ class ComputerTest {
     @ParameterizedTest
     @CsvSource("1,Computer,10000,100,INTEL_I5,NVIDIA_RTX_4060,_16GB")
     void shouldCreateComputerSuccessfully(long id, String name, BigDecimal price, int stock, Cpu cpu, Gpu gpu, Ram ram) {
-        Computer computer = new Computer(id, name, price, stock, cpu, gpu, ram);
+        Computer computer = new Computer(id, name, price, stock, new ComputerConfig(cpu, gpu, ram));
 
-        assertThat(computer.getCpu()).isEqualTo(cpu);
-        assertThat(computer.getGpu()).isEqualTo(gpu);
-        assertThat(computer.getRam()).isEqualTo(ram);
+        assertThat(computer.getConfig().cpu()).isEqualTo(cpu);
+        assertThat(computer.getConfig().gpu()).isEqualTo(gpu);
+        assertThat(computer.getConfig().ram()).isEqualTo(ram);
     }
 
     @ParameterizedTest
     @CsvSource({
-            "1,Computer,10000,100,,NVIDIA_RTX_4060,_16GB",
-            "1,Computer,10000,100,INTEL_I5,,_16GB",
-            "1,Computer,10000,100,INTEL_I5,NVIDIA_RTX_4060,"
+            "1,Computer,10000,100,"
     })
-    void shouldThrowNullPointerException(long id, String name, BigDecimal price, int stock, Cpu cpu, Gpu gpu, Ram ram) {
-        assertThatThrownBy(() -> new Computer(id, name, price, stock, cpu, gpu, ram))
+    void shouldThrowNullPointerException(long id, String name, BigDecimal price, int stock, ComputerConfig config) {
+        assertThatThrownBy(() -> new Computer(id, name, price, stock, config))
                 .isInstanceOf(NullPointerException.class);
     }
 }
