@@ -17,11 +17,12 @@ import java.util.stream.Stream;
 
 public class OrderProcessor {
     private static final int PROCESSING_TIME_IN_MILLIS = 200;
+    private static final int THREAD_POOL_SIZE = 10;
     private final ProductService productService;
     private final AtomicLong invoiceNumber = new AtomicLong(0);
 
     public OrderProcessor(ProductService productService) {
-        Validate.notNull(productService, "productManager can not be null");
+        Validate.notNull(productService, "productService can not be null");
         this.productService = productService;
     }
 
@@ -34,19 +35,27 @@ public class OrderProcessor {
     }
 
     public List<Invoice> processOrdersAsync(List<Order> orders) throws InterruptedException, ExecutionException {
+        List<Callable<Invoice>> tasks = createOrderProcessingTasks(orders);
+        try (ExecutorService pool = Executors.newFixedThreadPool(THREAD_POOL_SIZE)) {
+            List<Future<Invoice>> futureInvoices = pool.invokeAll(tasks);
+            return collectInvoices(futureInvoices);
+        }
+    }
+
+    private static List<Invoice> collectInvoices(List<Future<Invoice>> futureInvoices) throws InterruptedException, ExecutionException {
+        List<Invoice> invoices = new ArrayList<>();
+        for (Future<Invoice> futureInvoice : futureInvoices) {
+            invoices.add(futureInvoice.get());
+        }
+        return invoices;
+    }
+
+    private List<Callable<Invoice>> createOrderProcessingTasks(List<Order> orders) {
         List<Callable<Invoice>> tasks = new ArrayList<>();
         for (Order order : orders) {
             tasks.add(() -> process(order));
         }
-        try (ExecutorService pool = Executors.newFixedThreadPool(10)) {
-            List<Future<Invoice>> futureInvoices = pool.invokeAll(tasks);
-            List<Invoice> invoices = new ArrayList<>();
-            for (Future<Invoice> futureInvoice : futureInvoices) {
-                invoices.add(futureInvoice.get());
-            }
-            return invoices;
-        }
-
+        return tasks;
     }
 
     public Invoice process(Order order) {
