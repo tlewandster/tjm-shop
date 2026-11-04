@@ -28,7 +28,7 @@ import java.util.Scanner;
 public class Main {
     private static final Scanner SCANNER = new Scanner(System.in);
 
-    static void main(String[] args) {
+    static void main() {
         ProductRepository productRepository = new InMemoryProductRepository();
         ProductService productService = new ProductService(productRepository);
         OrderProcessor orderProcessor = new OrderProcessor(productService);
@@ -36,9 +36,9 @@ public class Main {
         Path dataDir = Path.of("data");
         Path stockStorageFile = dataDir.resolve("stock.txt");
 
-        productService.add(new Computer(1, "Lenovo Legion 5", new BigDecimal("5999.00"), 5, Cpu.AMD_RYZEN_7, Gpu.NVIDIA_RTX_4060, Ram._16GB));
-        productService.add(new Computer(2, "ASUS ROG Strix G16", new BigDecimal("8499.00"), 3, Cpu.INTEL_I7, Gpu.NVIDIA_RTX_4070, Ram._32GB));
-        productService.add(new Computer(3, "MSI Titan Pro", new BigDecimal("12999.00"), 2, Cpu.AMD_RYZEN_9, Gpu.NVIDIA_RTX_4080, Ram._64GB));
+        productService.add(new Computer(1, "Lenovo Legion 5", new BigDecimal("5999.00"), 5, new ComputerConfig(Cpu.AMD_RYZEN_7, Gpu.NVIDIA_RTX_4060, Ram._16GB)));
+        productService.add(new Computer(2, "ASUS ROG Strix G16", new BigDecimal("8499.00"), 3, new ComputerConfig(Cpu.INTEL_I7, Gpu.NVIDIA_RTX_4070, Ram._32GB)));
+        productService.add(new Computer(3, "MSI Titan Pro", new BigDecimal("12999.00"), 2, new ComputerConfig(Cpu.AMD_RYZEN_9, Gpu.NVIDIA_RTX_4080, Ram._64GB)));
 
         productService.add(new Smartphone(4, "Samsung Galaxy S25", new BigDecimal("3999.00"), 10, Colour.BLACK, 4000));
         productService.add(new Smartphone(5, "iPhone 17", new BigDecimal("4499.00"), 8, Colour.WHITE, 3600));
@@ -159,7 +159,7 @@ public class Main {
         System.out.println("Select CPU:");
         Arrays.stream(Cpu.values()).forEach(cpu -> System.out.println(cpu.ordinal() + 1 + ". " + cpu.name()));
         int cpuChoice = SCANNER.nextInt();
-        Cpu newCpu = switch (cpuChoice) {
+        return switch (cpuChoice) {
             case 1 -> Cpu.INTEL_I5;
             case 2 -> Cpu.INTEL_I7;
             case 3 -> Cpu.AMD_RYZEN_5;
@@ -167,14 +167,13 @@ public class Main {
             case 5 -> Cpu.AMD_RYZEN_9;
             default -> throw new IllegalStateException("Unexpected value: " + cpuChoice);
         };
-        return newCpu;
     }
 
     private static Gpu getNewGpu() {
         System.out.println("Select GPU:");
         Arrays.stream(Gpu.values()).forEach(gpu -> System.out.println(gpu.ordinal() + 1 + ". " + gpu.name()));
         int gpuChoice = SCANNER.nextInt();
-        Gpu newGpu = switch (gpuChoice) {
+        return switch (gpuChoice) {
             case 1 -> Gpu.NVIDIA_RTX_4060;
             case 2 -> Gpu.NVIDIA_RTX_4070;
             case 3 -> Gpu.NVIDIA_RTX_4080;
@@ -182,20 +181,18 @@ public class Main {
             case 5 -> Gpu.AMD_RX_7900;
             default -> throw new IllegalStateException("Unexpected value: " + gpuChoice);
         };
-        return newGpu;
     }
 
     private static Ram getNewRam() {
         System.out.println("Select RAM:");
         Arrays.stream(Ram.values()).forEach(ram -> System.out.println(ram.ordinal() + 1 + ". " + ram.name()));
         int ramChoice = SCANNER.nextInt();
-        Ram newRam = switch (ramChoice) {
+        return switch (ramChoice) {
             case 1 -> Ram._16GB;
             case 2 -> Ram._32GB;
             case 3 -> Ram._64GB;
             default -> throw new IllegalStateException("Unexpected value: " + ramChoice);
         };
-        return newRam;
     }
 
     private static void viewCart(Cart cart) {
@@ -210,7 +207,7 @@ public class Main {
         System.out.println("How many?");
         int qty = SCANNER.nextInt();
         Product product = productService.find(productId);
-        ComputerConfig config = product instanceof Computer computer ? new ComputerConfig(computer.getCpu(), computer.getGpu(), computer.getRam()) : null;
+        ComputerConfig config = product instanceof Computer computer ? new ComputerConfig(computer.getConfig().cpu(), computer.getConfig().gpu(), computer.getConfig().ram()) : null;
         cart.addItem(product, config, qty);
         System.out.printf("Added to cart %d pcs.:\n%s\n", qty, product.toString());
     }

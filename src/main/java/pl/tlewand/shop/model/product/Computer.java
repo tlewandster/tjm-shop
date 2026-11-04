@@ -7,23 +7,16 @@ import java.math.BigDecimal;
 
 @Getter
 public class Computer extends Product {
-    @Getter
-    private final Cpu cpu;
-    private final Gpu gpu;
-    private final Ram ram;
+    private final ComputerConfig config;
 
-    public Computer(long id, String name, BigDecimal price, int stock, Cpu cpu, Gpu gpu, Ram ram) {
-        Validate.notNull(cpu, "CPU cannot be null");
-        Validate.notNull(gpu, "GPU cannot be null");
-        Validate.notNull(ram, "RAM cannot be null");
+    public Computer(long id, String name, BigDecimal price, int stock, ComputerConfig config) {
+        Validate.notNull(config,"config cannot be null");
         super(id, name, price, stock);
-        this.cpu = cpu;
-        this.gpu = gpu;
-        this.ram = ram;
+        this.config = config;
     }
 
     @Override
     public String toString() {
-        return "%d - Computer %s (%s, %s, %s) - %s PLN - %d in stock".formatted(getId(), getName(), getCpu(), getGpu(), getRam(), getPrice(), getStock());
+        return "%d - Computer %s (%s, %s, %s) - %s PLN - %d in stock".formatted(getId(), getName(), config.cpu(), config.gpu(), config.ram(), getPrice(), getStock());
     }
 }

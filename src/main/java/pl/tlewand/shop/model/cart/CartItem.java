@@ -31,11 +31,8 @@ public class CartItem {
     public BigDecimal calculateUnitItemPrice() {
         BigDecimal price = product.getPrice();
         if (product instanceof Computer computer) {
-            BigDecimal cpuPriceDifference = itemConfig.cpu().getPrice().subtract(computer.getCpu().getPrice());
-            BigDecimal gpuPriceDifference = itemConfig.gpu().getPrice().subtract(computer.getGpu().getPrice());
-            BigDecimal ramPriceDifference = itemConfig.ram().getPrice().subtract(computer.getRam().getPrice());
-            BigDecimal totalConfigPriceDifference = cpuPriceDifference.add(gpuPriceDifference).add(ramPriceDifference);
-            price = product.getPrice().add(totalConfigPriceDifference);
+            BigDecimal configPriceDifference = itemConfig.calculatePrice().subtract(computer.getConfig().calculatePrice());
+            price = product.getPrice().add(configPriceDifference);
         }
         return price;
     }
