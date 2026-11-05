@@ -37,7 +37,7 @@ public class CartItem {
     @Override
     public String toString() {
         String description = "";
-        if (product instanceof Computer computer) {
+        if (product instanceof Computer) {
             description = "(%s, %s, %s)".formatted(itemConfig.cpu(), itemConfig.gpu(), itemConfig.ram());
         } else if (product instanceof Smartphone smartphone) {
             description = "(%s, %smAh)".formatted(smartphone.getColour(), smartphone.getBatteryCapacityMah());
