@@ -13,20 +13,30 @@ public record Invoice(long invoiceNumber, Order order) {
 
     @Override
     public String toString() {
-        String cartItems = order.getOrderItems().stream()
+        String invoiceItems = getInvoiceItems();
+        String orderDate = getOrderDate();
+        return getFormattedInvoiceText(orderDate, invoiceItems);
+    }
+
+    private String getInvoiceItems() {
+        return order.getOrderItems().stream()
                 .map(OrderItem::toString)
                 .collect(Collectors.joining("\n"));
+    }
 
-        String orderDate = order.getZonedOrderedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
+    private String getOrderDate() {
+        return order.getZonedOrderedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
+    }
 
-        return """
-                Invoice no. %d dated %s
-                Buyer: %s
-                Items:
-                %s
-                Total order value: %s
-                Discount value: %s
-                Total due: %s
-                """.formatted(invoiceNumber,orderDate, order.getClient(),cartItems,order.getTotalOrder(), order.getDiscountAmount(), order.getTotalDue());
+    private String getFormattedInvoiceText(String orderDate, String invoiceItems) {
+        return new StringBuilder()
+                .append("Invoice no. ").append(invoiceNumber)
+                .append(" dated ").append(orderDate).append("\n")
+                .append("Buyer: ").append(order.getClient()).append("\n")
+                .append("Items: ").append(invoiceItems).append("\n")
+                .append("Total order value: ").append(order.getTotalOrder()).append("\n")
+                .append("Discount value: ").append(order.getDiscountAmount()).append("\n")
+                .append("Total due: ").append(order.getTotalDue()).append("\n")
+                .toString();
     }
 }
