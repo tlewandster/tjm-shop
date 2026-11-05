@@ -17,6 +17,15 @@ public class Cart {
     private long itemIdCounter = 0;
 
     public void addItem(Product product, ComputerConfig config, int qty) {
+        validateProduct(product, config, qty);
+        validateStock(product, qty);
+        findSameItem(product, config)
+                .ifPresentOrElse(cartItem -> cartItem.increaseQtyBy(qty)
+                        , () -> addNewItem(product, config, qty)
+                );
+    }
+
+    private static void validateProduct(Product product, ComputerConfig config, int qty) {
         Validate.notNull(product, "Product cannot be null");
         Validate.isTrue(qty > 0, "Quantity must be > 0");
         if (product instanceof Computer && config == null) {
@@ -25,7 +34,9 @@ public class Cart {
         if (!(product instanceof Computer) && config != null) {
             throw new IllegalArgumentException("Only computer can have configuration");
         }
+    }
 
+    private void validateStock(Product product, int qty) {
         int summaryQtySameItemsInCart = items.values().stream()
                 .filter(cartItem -> cartItem.getProduct().getId() == product.getId())
                 .mapToInt(CartItem::getQty).sum();
@@ -34,16 +45,17 @@ public class Cart {
         if (requestedQty > stock) {
             throw new OutOfStockException("Requested quantity (%d pcs. %s) exceeds the current stock (%d)".formatted(requestedQty, product.getName(), stock));
         }
+    }
 
-        Optional<CartItem> sameItemInCart = items.values().stream()
+    private Optional<CartItem> findSameItem(Product product, ComputerConfig config) {
+        return items.values().stream()
                 .filter((cartItem) ->
                         cartItem.getProduct().getId() == product.getId() &&
                                 Objects.equals(cartItem.getItemConfig(), config))
                 .findFirst();
-        if (sameItemInCart.isPresent()) {
-            sameItemInCart.get().increaseQtyBy(qty);
-            return;
-        }
+    }
+
+    private void addNewItem(Product product, ComputerConfig config, int qty) {
         itemIdCounter++;
         CartItem cartItem = new CartItem(itemIdCounter, product, config, qty);
         items.put(itemIdCounter, cartItem);
