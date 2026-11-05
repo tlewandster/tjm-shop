@@ -28,7 +28,7 @@ public class OrderProcessor {
 
     public Invoice process(Order order) {
         validateAndReduceStock(order);
-        simulateLongOrderProcessing(PROCESSING_TIME_IN_MILLIS);
+        simulateLongOrderProcessing();
         return generateInvoice(order);
     }
 
@@ -83,9 +83,9 @@ public class OrderProcessor {
                 .entrySet().stream();
     }
 
-    private void simulateLongOrderProcessing(long timeInMillis) {
+    private void simulateLongOrderProcessing() {
         try {
-            Thread.sleep(timeInMillis);
+            Thread.sleep((long) OrderProcessor.PROCESSING_TIME_IN_MILLIS);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
