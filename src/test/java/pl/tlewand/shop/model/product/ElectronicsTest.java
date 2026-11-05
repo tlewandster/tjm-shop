@@ -14,10 +14,8 @@ class ElectronicsTest {
             "1, Product, 0, 0"
     })
     void shouldCreateElectronicsSuccessfully(long id, String name, BigDecimal price, int stock) {
-        //when
         Electronics electronics = new Electronics(id, name, price, stock);
 
-        //then
         assertThat(electronics.getId()).isEqualTo(id);
         assertThat(electronics.getName()).isEqualTo(name);
         assertThat(electronics.getPrice()).isEqualByComparingTo(price);
