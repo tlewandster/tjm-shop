@@ -26,6 +26,12 @@ public class OrderProcessor {
         this.productService = productService;
     }
 
+    public Invoice process(Order order) {
+        validateAndReduceStock(order);
+        simulateLongOrderProcessing(PROCESSING_TIME_IN_MILLIS);
+        return generateInvoice(order);
+    }
+
     public List<Invoice> processOrdersSync(List<Order> orders) {
         List<Invoice> invoices = new ArrayList<>();
         for (Order order : orders) {
@@ -42,39 +48,13 @@ public class OrderProcessor {
         }
     }
 
-    private static List<Invoice> collectInvoices(List<Future<Invoice>> futureInvoices) throws InterruptedException, ExecutionException {
-        List<Invoice> invoices = new ArrayList<>();
-        for (Future<Invoice> futureInvoice : futureInvoices) {
-            invoices.add(futureInvoice.get());
-        }
-        return invoices;
-    }
-
-    private List<Callable<Invoice>> createOrderProcessingTasks(List<Order> orders) {
-        List<Callable<Invoice>> tasks = new ArrayList<>();
-        for (Order order : orders) {
-            tasks.add(() -> process(order));
-        }
-        return tasks;
-    }
-
-    public Invoice process(Order order) {
-        validateAndReduceStock(order);
-        simulateLongOrderProcessing(PROCESSING_TIME_IN_MILLIS);
-        return generateInvoice(order);
-    }
-
-    private void simulateLongOrderProcessing(long timeInMillis) {
-        try {
-            Thread.sleep(timeInMillis);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-    }
-
-    private synchronized void validateAndReduceStock(Order order){
+    private synchronized void validateAndReduceStock(Order order) {
         validateStock(order);
         reduceStocks(order);
+    }
+
+    private Invoice generateInvoice(Order order) {
+        return new Invoice(invoiceNumber.incrementAndGet(), order);
     }
 
     private void validateStock(Order order) {
@@ -103,7 +83,27 @@ public class OrderProcessor {
                 .entrySet().stream();
     }
 
-    private Invoice generateInvoice(Order order) {
-        return new Invoice(invoiceNumber.incrementAndGet(), order);
+    private void simulateLongOrderProcessing(long timeInMillis) {
+        try {
+            Thread.sleep(timeInMillis);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    private List<Callable<Invoice>> createOrderProcessingTasks(List<Order> orders) {
+        List<Callable<Invoice>> tasks = new ArrayList<>();
+        for (Order order : orders) {
+            tasks.add(() -> process(order));
+        }
+        return tasks;
+    }
+
+    private static List<Invoice> collectInvoices(List<Future<Invoice>> futureInvoices) throws InterruptedException, ExecutionException {
+        List<Invoice> invoices = new ArrayList<>();
+        for (Future<Invoice> futureInvoice : futureInvoices) {
+            invoices.add(futureInvoice.get());
+        }
+        return invoices;
     }
 }

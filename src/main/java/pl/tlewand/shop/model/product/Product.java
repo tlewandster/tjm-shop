@@ -23,23 +23,6 @@ public abstract class Product {
         this.stock = stock;
     }
 
-    private static void validateStock(int stock) {
-        if (stock < 0) {
-            throw new IllegalArgumentException("Stock cannot be less than zero");
-        }
-    }
-
-    private static void validatePrice(BigDecimal price) {
-        Validate.notNull(price, "Price cannot be null");
-        if (price.signum() == -1) {
-            throw new IllegalArgumentException("Price cannot be less than zero");
-        }
-    }
-
-    private static void validateName(String name) {
-        Validate.notBlank(name, "name cannot be null or blank");
-    }
-
     public void setName(String name) {
         validateName(name);
         this.name = name;
@@ -53,5 +36,22 @@ public abstract class Product {
     public void setStock(int stock) {
         validateStock(stock);
         this.stock = stock;
+    }
+
+    private static void validateName(String name) {
+        Validate.notBlank(name, "name cannot be null or blank");
+    }
+
+    private static void validatePrice(BigDecimal price) {
+        Validate.notNull(price, "Price cannot be null");
+        if (price.signum() == -1) {
+            throw new IllegalArgumentException("Price cannot be less than zero");
+        }
+    }
+
+    private static void validateStock(int stock) {
+        if (stock < 0) {
+            throw new IllegalArgumentException("Stock cannot be less than zero");
+        }
     }
 }

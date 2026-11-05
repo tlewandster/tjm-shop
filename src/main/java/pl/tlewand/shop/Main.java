@@ -100,6 +100,23 @@ public class Main {
         } while (choice != 0);
     }
 
+    private static void productList(ProductService productService) {
+        productService.findAll()
+                .forEach(System.out::println);
+        System.out.println();
+    }
+
+    private static void addToCart(Cart cart, ProductService productService) {
+        System.out.println("Which product add to cart?");
+        long productId = SCANNER.nextLong();
+        System.out.println("How many?");
+        int qty = SCANNER.nextInt();
+        Product product = productService.find(productId);
+        ComputerConfig config = product instanceof Computer computer ? new ComputerConfig(computer.getConfig().cpu(), computer.getConfig().gpu(), computer.getConfig().ram()) : null;
+        cart.addItem(product, config, qty);
+        System.out.printf("Added to cart %d pcs.:\n%s\n", qty, product.toString());
+    }
+
     private static void removeFromCart(Cart cart) {
         viewCart(cart);
         System.out.println("Which item remove from cart?");
@@ -108,19 +125,10 @@ public class Main {
         System.out.println("Removed");
     }
 
-    private static void placeOrder(Cart cart, Client client, OrderProcessor orderProcessor, DiscountService discountService) {
-        Code userCode;
-        System.out.println("Enter discount code: ");
-        try {
-            userCode = Code.validate(SCANNER.nextLine());
-        } catch (IllegalArgumentException e) {
-            System.out.println("Invalid code");
-            userCode = Code.NO_CODE;
-        }
-        Order order = cart.checkout(client);
-        order.applyDiscount(discountService.getBestDiscountValue(order.getZonedOrderedAt().toLocalTime(), order.getTotalOrder(), userCode));
-        Invoice invoice = orderProcessor.process(order);
-        System.out.println(invoice);
+    private static void viewCart(Cart cart) {
+        cart.getItems()
+                .forEach(System.out::println);
+        System.out.println("Total cart value: " + cart.calculateTotalPrice());
     }
 
     private static void changeConfig(Cart cart) {
@@ -195,26 +203,18 @@ public class Main {
         };
     }
 
-    private static void viewCart(Cart cart) {
-        cart.getItems()
-                .forEach(System.out::println);
-        System.out.println("Total cart value: " + cart.calculateTotalPrice());
-    }
-
-    private static void addToCart(Cart cart, ProductService productService) {
-        System.out.println("Which product add to cart?");
-        long productId = SCANNER.nextLong();
-        System.out.println("How many?");
-        int qty = SCANNER.nextInt();
-        Product product = productService.find(productId);
-        ComputerConfig config = product instanceof Computer computer ? new ComputerConfig(computer.getConfig().cpu(), computer.getConfig().gpu(), computer.getConfig().ram()) : null;
-        cart.addItem(product, config, qty);
-        System.out.printf("Added to cart %d pcs.:\n%s\n", qty, product.toString());
-    }
-
-    private static void productList(ProductService productService) {
-        productService.findAll()
-                .forEach(System.out::println);
-        System.out.println();
+    private static void placeOrder(Cart cart, Client client, OrderProcessor orderProcessor, DiscountService discountService) {
+        Code userCode;
+        System.out.println("Enter discount code: ");
+        try {
+            userCode = Code.validate(SCANNER.nextLine());
+        } catch (IllegalArgumentException e) {
+            System.out.println("Invalid code");
+            userCode = Code.NO_CODE;
+        }
+        Order order = cart.checkout(client);
+        order.applyDiscount(discountService.getBestDiscountValue(order.getZonedOrderedAt().toLocalTime(), order.getTotalOrder(), userCode));
+        Invoice invoice = orderProcessor.process(order);
+        System.out.println(invoice);
     }
 }

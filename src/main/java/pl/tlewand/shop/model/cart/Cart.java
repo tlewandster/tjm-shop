@@ -25,42 +25,6 @@ public class Cart {
                 );
     }
 
-    private static void validateProduct(Product product, ComputerConfig config, int qty) {
-        Validate.notNull(product, "Product cannot be null");
-        Validate.isTrue(qty > 0, "Quantity must be > 0");
-        if (product instanceof Computer && config == null) {
-            throw new IllegalArgumentException("Computer must have configuration");
-        }
-        if (!(product instanceof Computer) && config != null) {
-            throw new IllegalArgumentException("Only computer can have configuration");
-        }
-    }
-
-    private void validateStock(Product product, int qty) {
-        int summaryQtySameItemsInCart = items.values().stream()
-                .filter(cartItem -> cartItem.getProduct().getId() == product.getId())
-                .mapToInt(CartItem::getQty).sum();
-        int requestedQty = summaryQtySameItemsInCart + qty;
-        int stock = product.getStock();
-        if (requestedQty > stock) {
-            throw new OutOfStockException("Requested quantity (%d pcs. %s) exceeds the current stock (%d)".formatted(requestedQty, product.getName(), stock));
-        }
-    }
-
-    private Optional<CartItem> findSameItem(Product product, ComputerConfig config) {
-        return items.values().stream()
-                .filter((cartItem) ->
-                        cartItem.getProduct().getId() == product.getId() &&
-                                Objects.equals(cartItem.getItemConfig(), config))
-                .findFirst();
-    }
-
-    private void addNewItem(Product product, ComputerConfig config, int qty) {
-        itemIdCounter++;
-        CartItem cartItem = new CartItem(itemIdCounter, product, config, qty);
-        items.put(itemIdCounter, cartItem);
-    }
-
     public void removeItem(long itemId) {
         if (items.remove(itemId) == null) {
             throw new NoSuchElementException("Item " + itemId + " is not in cart");
@@ -99,5 +63,42 @@ public class Cart {
         Order order = new Order(client, orderItems);
         clear();
         return order;
+    }
+
+    private static void validateProduct(Product product, ComputerConfig config, int qty) {
+        Validate.notNull(product, "Product cannot be null");
+        Validate.isTrue(qty > 0, "Quantity must be > 0");
+        if (product instanceof Computer && config == null) {
+            throw new IllegalArgumentException("Computer must have configuration");
+        }
+        if (!(product instanceof Computer) && config != null) {
+            throw new IllegalArgumentException("Only computer can have configuration");
+        }
+    }
+
+    private void validateStock(Product product, int qty) {
+        int summaryQtySameItemsInCart = items.values().stream()
+                .filter(cartItem -> cartItem.getProduct().getId() == product.getId())
+                .mapToInt(CartItem::getQty).sum();
+        int requestedQty = summaryQtySameItemsInCart + qty;
+        int stock = product.getStock();
+        if (requestedQty > stock) {
+            throw new OutOfStockException("Requested quantity (%d pcs. %s) exceeds the current stock (%d)"
+                    .formatted(requestedQty, product.getName(), stock));
+        }
+    }
+
+    private Optional<CartItem> findSameItem(Product product, ComputerConfig config) {
+        return items.values().stream()
+                .filter((cartItem) ->
+                        cartItem.getProduct().getId() == product.getId() &&
+                                Objects.equals(cartItem.getItemConfig(), config))
+                .findFirst();
+    }
+
+    private void addNewItem(Product product, ComputerConfig config, int qty) {
+        itemIdCounter++;
+        CartItem cartItem = new CartItem(itemIdCounter, product, config, qty);
+        items.put(itemIdCounter, cartItem);
     }
 }

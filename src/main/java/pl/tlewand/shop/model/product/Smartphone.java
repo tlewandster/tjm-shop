@@ -17,6 +17,7 @@ public class Smartphone extends Product {
 
     @Override
     public String toString() {
-        return "%d - Smartphone %s (%s, %d mAh) - %s PLN - %d in stock".formatted(getId(), getName(), getColour(), getBatteryCapacityMah(), getPrice(), getStock());
+        return "%d - Smartphone %s (%s, %d mAh) - %s PLN - %d in stock"
+                .formatted(getId(), getName(), getColour(), getBatteryCapacityMah(), getPrice(), getStock());
     }
 }

@@ -11,7 +11,6 @@ public class NightDiscount implements DiscountPolicy {
 
     @Override
     public BigDecimal calculateDiscountValue(LocalTime orderTime, BigDecimal totalOrder, Code discountCode) {
-
         validate(orderTime, totalOrder, discountCode);
         if (orderTime.isAfter(startTime) && orderTime.isBefore(endTime)) {
             return calculatePercentageOf(totalOrder, discountPercent);

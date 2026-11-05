@@ -24,14 +24,11 @@ public class CartItem {
         this.qty = qty;
     }
 
-    void increaseQtyBy(int qty) {
-        this.qty += qty;
-    }
-
     public BigDecimal calculateUnitItemPrice() {
         BigDecimal price = product.getPrice();
         if (product instanceof Computer computer) {
-            BigDecimal configPriceDifference = itemConfig.calculatePrice().subtract(computer.getConfig().calculatePrice());
+            BigDecimal configPriceDifference = itemConfig
+                    .calculatePrice().subtract(computer.getConfig().calculatePrice());
             price = product.getPrice().add(configPriceDifference);
         }
         return price;
@@ -53,5 +50,9 @@ public class CartItem {
                 calculateUnitItemPrice(),
                 calculateUnitItemPrice().multiply(new BigDecimal(qty))
         );
+    }
+
+    void increaseQtyBy(int qty) {
+        this.qty += qty;
     }
 }

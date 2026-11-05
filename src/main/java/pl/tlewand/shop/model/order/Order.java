@@ -36,13 +36,13 @@ public class Order {
         return totalOrder.subtract(discountAmount);
     }
 
+    public ZonedDateTime getZonedOrderedAt() {
+        return orderedAt.atZone(SHOP_ZONE);
+    }
+
     private BigDecimal calculateTotalOrderPrice(List<OrderItem> orderItems) {
         return orderItems.stream()
                 .map(OrderItem::calculateItemPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-
-    public ZonedDateTime getZonedOrderedAt() {
-        return orderedAt.atZone(SHOP_ZONE);
     }
 }

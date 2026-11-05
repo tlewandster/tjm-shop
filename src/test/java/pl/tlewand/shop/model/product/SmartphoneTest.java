@@ -22,7 +22,7 @@ class SmartphoneTest {
     @ParameterizedTest
     @CsvSource("1,Smartphone,1000,100,,1000")
     void shouldThrowNullPointerException(long id, String name, BigDecimal price, int stock, Colour colour, int batteryCapacityMah) {
-        assertThatThrownBy(()->new Smartphone(id, name, price, stock, new SmartphoneSpec(colour, batteryCapacityMah)))
+        assertThatThrownBy(() -> new Smartphone(id, name, price, stock, new SmartphoneSpec(colour, batteryCapacityMah)))
                 .isInstanceOf(NullPointerException.class);
     }
 
@@ -32,7 +32,7 @@ class SmartphoneTest {
             "1,Smartphone,1000,100,BLACK,-1000",
     })
     void shouldThrowIllegalArgumentException(long id, String name, BigDecimal price, int stock, Colour colour, int batteryCapacityMah) {
-        assertThatThrownBy(()->new Smartphone(id, name, price, stock, new SmartphoneSpec(colour, batteryCapacityMah)))
+        assertThatThrownBy(() -> new Smartphone(id, name, price, stock, new SmartphoneSpec(colour, batteryCapacityMah)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

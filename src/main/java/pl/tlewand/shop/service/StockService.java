@@ -13,7 +13,7 @@ public class StockService {
     private final FileStorage fileStorage;
 
     public StockService(FileStorage fileStorage) {
-        Validate.notNull(fileStorage,"File storage can not be null");
+        Validate.notNull(fileStorage, "File storage can not be null");
         this.fileStorage = fileStorage;
     }
 
