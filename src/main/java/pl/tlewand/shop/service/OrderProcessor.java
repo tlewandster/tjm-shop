@@ -1,0 +1,109 @@
+package pl.tlewand.shop.service;
+
+import org.apache.commons.lang3.Validate;
+import pl.tlewand.shop.exception.OutOfStockException;
+import pl.tlewand.shop.model.order.Invoice;
+import pl.tlewand.shop.model.order.Order;
+import pl.tlewand.shop.model.order.OrderItem;
+import pl.tlewand.shop.model.product.Product;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+public class OrderProcessor {
+    private static final int PROCESSING_TIME_IN_MILLIS = 200;
+    private static final int THREAD_POOL_SIZE = 10;
+    private final ProductService productService;
+    private final AtomicLong invoiceNumber = new AtomicLong(0);
+
+    public OrderProcessor(ProductService productService) {
+        Validate.notNull(productService, "productService can not be null");
+        this.productService = productService;
+    }
+
+    public Invoice process(Order order) {
+        validateAndReduceStock(order);
+        simulateLongOrderProcessing();
+        return generateInvoice(order);
+    }
+
+    public List<Invoice> processOrdersSync(List<Order> orders) {
+        List<Invoice> invoices = new ArrayList<>();
+        for (Order order : orders) {
+            invoices.add(process(order));
+        }
+        return invoices;
+    }
+
+    public List<Invoice> processOrdersAsync(List<Order> orders) throws InterruptedException, ExecutionException {
+        List<Callable<Invoice>> tasks = createOrderProcessingTasks(orders);
+        try (ExecutorService pool = Executors.newFixedThreadPool(THREAD_POOL_SIZE)) {
+            List<Future<Invoice>> futureInvoices = pool.invokeAll(tasks);
+            return collectInvoices(futureInvoices);
+        }
+    }
+
+    private synchronized void validateAndReduceStock(Order order) {
+        validateStock(order);
+        reduceStocks(order);
+    }
+
+    private Invoice generateInvoice(Order order) {
+        return new Invoice(invoiceNumber.incrementAndGet(), order);
+    }
+
+    private void validateStock(Order order) {
+        getStreamIdQtyFrom(order).forEach(entry -> {
+            Product product = productService.find(entry.getKey());
+            int stock = product.getStock();
+            Integer requestedQty = entry.getValue();
+            if (requestedQty > stock) {
+                throw new OutOfStockException("Requested quantity (%d pcs. %s) exceeds the current stock (%d)".formatted(requestedQty, product.getName(), stock));
+            }
+        });
+    }
+
+    private void reduceStocks(Order order) {
+        getStreamIdQtyFrom(order).forEach(entry -> {
+            Long productId = entry.getKey();
+            Integer qty = entry.getValue();
+            int newStock = productService.find(productId).getStock() - qty;
+            productService.updateStock(productId, newStock);
+        });
+    }
+
+    private Stream<Map.Entry<Long, Integer>> getStreamIdQtyFrom(Order order) {
+        return order.getOrderItems().stream()
+                .collect(Collectors.groupingBy(OrderItem::productId, Collectors.summingInt(OrderItem::qty)))
+                .entrySet().stream();
+    }
+
+    private void simulateLongOrderProcessing() {
+        try {
+            Thread.sleep((long) OrderProcessor.PROCESSING_TIME_IN_MILLIS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    private List<Callable<Invoice>> createOrderProcessingTasks(List<Order> orders) {
+        List<Callable<Invoice>> tasks = new ArrayList<>();
+        for (Order order : orders) {
+            tasks.add(() -> process(order));
+        }
+        return tasks;
+    }
+
+    private static List<Invoice> collectInvoices(List<Future<Invoice>> futureInvoices) throws InterruptedException, ExecutionException {
+        List<Invoice> invoices = new ArrayList<>();
+        for (Future<Invoice> futureInvoice : futureInvoices) {
+            invoices.add(futureInvoice.get());
+        }
+        return invoices;
+    }
+}
