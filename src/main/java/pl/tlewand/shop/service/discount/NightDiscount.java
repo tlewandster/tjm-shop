@@ -1,8 +1,11 @@
 package pl.tlewand.shop.service.discount;
 
+import pl.tlewand.shop.model.order.Order;
+
 import java.math.BigDecimal;
 import java.time.LocalTime;
 
+/// Discount strategy offering 15% discount on orders placed between midnight and 6 a.m. in shop time zone.
 public class NightDiscount implements DiscountPolicy {
 
     private final static int DISCOUNT_PERCENT = 15;

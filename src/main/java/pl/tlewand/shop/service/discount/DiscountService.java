@@ -4,6 +4,10 @@ import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.List;
 
+/// Processes a list of available [DiscountPolicy] items
+/// to determine the most favorable discount for a given order.
+///
+/// Context in the Strategy pattern.
 public class DiscountService {
     private final List<DiscountPolicy> discountPolicies;
 
