@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalTime;
 
+@FunctionalInterface
 public interface DiscountPolicy {
     BigDecimal calculateDiscountValue(LocalTime orderTime, BigDecimal totalOrder, Code discountCode);
 
