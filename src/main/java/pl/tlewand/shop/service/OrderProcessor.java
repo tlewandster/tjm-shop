@@ -91,6 +91,9 @@ public class OrderProcessor {
         }
     }
 
+    /// Wraps each order in [Callable] that processes it and returns its [Invoice].
+    ///
+    /// Command pattern: each task is a command object, and is passed to [ExecutorService].
     private List<Callable<Invoice>> createOrderProcessingTasks(List<Order> orders) {
         List<Callable<Invoice>> tasks = new ArrayList<>();
         for (Order order : orders) {
