@@ -8,6 +8,7 @@ import pl.tlewand.shop.model.order.Invoice;
 import pl.tlewand.shop.model.order.Order;
 import pl.tlewand.shop.model.product.*;
 import pl.tlewand.shop.repository.InMemoryProductRepository;
+import pl.tlewand.shop.repository.LoggingProductRepository;
 import pl.tlewand.shop.repository.ProductRepository;
 import pl.tlewand.shop.service.OrderProcessor;
 import pl.tlewand.shop.service.ProductService;
@@ -29,7 +30,7 @@ public class Main {
     private static final Scanner SCANNER = new Scanner(System.in);
 
     static void main() {
-        ProductRepository productRepository = new InMemoryProductRepository();
+        ProductRepository productRepository = new LoggingProductRepository(new InMemoryProductRepository());
         ProductService productService = new ProductService(productRepository);
         OrderProcessor orderProcessor = new OrderProcessor(productService);
         StockService stockService = new StockService(new FileStorage());
